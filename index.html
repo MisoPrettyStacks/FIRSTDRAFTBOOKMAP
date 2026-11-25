@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>XRP/USD Order Book Heatmap</title>
+<style>
+:root{--bg:#0b0e14;--p:#121722;--b:#222a3a;--t:#d7deea;--m:#7f8aa3;--g:#26d07c;--r:#ff4d5e;--a:#4da3ff}
+*{box-sizing:border-box}html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--t);font:13px/1.35 system-ui,-apple-system,Segoe UI,sans-serif;display:flex;flex-direction:column}
+header{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:8px 12px;border-bottom:1px solid var(--b)}
+h1{font-size:15px;margin:0 8px 0 0}
+.pill{padding:2px 9px;border-radius:99px;border:1px solid var(--b);color:var(--m);cursor:help}
+.pill.ok{color:var(--g);border-color:#1a5a3b}.pill.bad{color:var(--r);border-color:#6b2630}
+.ctl{display:flex;align-items:center;gap:5px;color:var(--m)}
+select,input,button{background:var(--p);color:var(--t);border:1px solid var(--b);border-radius:6px;padding:3px 6px;font:inherit}
+button{cursor:pointer}input[type=range]{padding:0;width:80px}input[type=number]{width:80px}
+#stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;padding:8px 12px}
+.card{background:var(--p);border:1px solid var(--b);border-radius:8px;padding:6px 10px;cursor:help}
+.card small{color:var(--m);display:block}.card b{font-size:16px}
+main{flex:1;display:flex;gap:8px;padding:0 12px 8px;min-height:0}
+#hm{flex:1;position:relative;background:#05070c;border:1px solid var(--b);border-radius:8px;min-width:0}
+#hm canvas{position:absolute;inset:0;width:100%;height:100%}
+aside{width:310px;display:flex;flex-direction:column;gap:8px;min-height:0}
+.box{background:var(--p);border:1px solid var(--b);border-radius:8px;padding:6px 8px;overflow:hidden}
+.box h3{margin:0 0 4px;font-size:12px;color:var(--m);text-transform:uppercase;letter-spacing:.05em;cursor:help}
+#lad{font:12px ui-monospace,Menlo,monospace}
+.row{display:flex;justify-content:space-between;position:relative;padding:0 4px;height:17px;line-height:17px}
+.row i{position:absolute;right:0;top:1px;bottom:1px;opacity:.28;z-index:0}
+.row span{position:relative;z-index:1}
+.a{color:var(--r)}.bd{color:var(--g)}.a i{background:var(--r)}.bd i{background:var(--g)}
+.sp{text-align:center;color:var(--m);font-size:11px;padding:2px}
+#feedbox{flex:1;display:flex;flex-direction:column;min-height:120px}
+#feed{overflow:auto;flex:1;font:11.5px ui-monospace,Menlo,monospace}
+#feed div{padding:1px 0;border-bottom:1px solid #1a2130;white-space:nowrap}
+#l3s{display:grid;grid-template-columns:1fr 1fr;gap:2px 8px;color:var(--m);font-size:12px;margin-bottom:4px}
+#l3s b{color:var(--t)}
+#tip{position:fixed;z-index:9;background:#1d2538;border:1px solid #38466a;border-radius:6px;padding:6px 9px;max-width:290px;pointer-events:none;display:none;box-shadow:0 4px 18px #000a}
+footer{padding:4px 12px 8px;color:var(--m);font-size:11px}
+@media(max-width:900px){main{flex-direction:column;overflow:auto}#hm{min-height:380px;flex:none}aside{width:auto}}
+</style></head><body>
+<header>
+<h1>XRP/USD · Order Book Heatmap</h1>
+<span class="pill" id="p1" data-tip="Level 2 feed (price + total size at each price) from Kraken. Green = connected.">Kraken L2 …</span>
+<span class="pill" id="p2" data-tip="Level 3 feed (every individual order placed, changed, cancelled) from Bitstamp. Green = connected.">Bitstamp L3 …</span>
+<label class="ctl" data-tip="How far above/below the current price the chart shows. Smaller = more detail near price.">Range
+<select id="rng"><option value=.005>±0.5%</option><option value=.01 selected>±1%</option><option value=.02>±2%</option><option value=.05>±5%</option></select></label>
+<label class="ctl" data-tip="Brightness curve. Lower = faint (small) orders become visible. Higher = only the biggest walls glow.">Contrast
+<input id="gam" type="range" min=".25" max="1" step=".05" value=".6"></label>
+<label class="ctl" data-tip="Orders worth at least this many USD are 'whales' and appear in the Level 3 feed. Smaller orders are counted but not listed.">Whale ≥ $
+<input id="whale" type="number" value="25000" step="5000" min="0"></label>
+<button id="pause" data-tip="Freeze the chart so you can inspect it with the mouse. Data keeps recording in the background.">Pause</button>
+</header>
+<section id="stats"></section>
+<main>
+<div id="hm"><canvas id="c"></canvas><canvas id="o"></canvas></div>
+<aside>
+<div class="box"><h3 data-tip="Live Level 2 order book from Kraken. Red = sell orders (asks) above, green = buy orders (bids) below. Bar length = size relative to the biggest level shown.">Order book ladder</h3><div id="lad"></div></div>
+<div class="box" id="feedbox"><h3 data-tip="Level 3 = individual orders. Source: Bitstamp (the only major exchange giving order-by-order data free, no login). NEW = order placed, CANCEL = order removed (cancelled OR filled — the feed can't tell which), CHG = size changed.">Level 3 · individual orders (Bitstamp)</h3>
+<div id="l3s"></div><div id="feed"></div></div>
+</aside></main>
+<footer>Data: Kraken (L2) + Bitstamp (L3) public WebSockets, free, no keys. Shows only these two venues, not the whole XRP market. Not financial advice.</footer>
+<div id="tip"></div>
+<script>
+const $=id=>document.getElementById(id),MAXC=900,DEPTH=500;
+const S={b:new Map(),a:new Map(),cols:[],tr:[],ord:new Map(),ev:[],mid:0,paused:false,cache:[],mouse:null,view:null};
+const fm=n=>n>=1e6?(n/1e6).toFixed(2)+'M':n>=1e3?(n/1e3).toFixed(1)+'K':n.toFixed(0);
+const fp=p=>p.toFixed(4);
+// ---------- tooltips
+const tip=$('tip');
+document.addEventListener('mousemove',e=>{
+  const el=e.target.closest&&e.target.closest('[data-tip]');
+  if(!el){tip.style.display='none';return}
+  tip.textContent=el.dataset.tip;tip.style.display='block';
+  tip.style.left=Math.min(e.clientX+14,innerWidth-300)+'px';tip.style.top=Math.min(e.clientY+16,innerHeight-90)+'px';});
+// ---------- stat cards
+const CARDS=[['mid','Mid price','Halfway between best buy and best sell price. This is the "current price" the heatmap is centered on.'],
+['spr','Spread','Gap between best buy and best sell, in basis points (1 bp = 0.01%). Tight = liquid market.'],
+['imb','Book imbalance (±1%)','Share of resting USD within 1% of price that is on the BUY side. Above 50% = more buyers waiting (supportive), below 50% = more sellers waiting (pressure). A hint, not a guarantee.'],
+['bd','Bid depth ±1%','Total USD of buy orders waiting within 1% below price.'],
+['ad','Ask depth ±1%','Total USD of sell orders waiting within 1% above price.'],
+['bw','Biggest buy wall','Largest single price level of buy orders within 2% (potential support). Walls can be pulled at any time.'],
+['aw','Biggest sell wall','Largest single price level of sell orders within 2% (potential resistance). Walls can be pulled at any time.'],
+['cvd','Net flow (5 min)','Aggressive market buys minus market sells in the last 5 minutes (USD, Kraken trades). Positive = buyers hitting asks, negative = sellers hitting bids.']];
+$('stats').innerHTML=CARDS.map(c=>`<div class="card" data-tip="${c[2]}"><small>${c[1]}</small><b id="s_${c[0]}">–</b></div>`).join('');
+const sv=(k,v,cls)=>{const e=$('s_'+k);e.textContent=v;e.style.color=cls||''};
+// ---------- sockets
+function conn(url,sub,fn,pill,name){
+  const p=$(pill);let ws;
+  (function go(){ws=new WebSocket(url);
+    ws.onopen=()=>{p.textContent=name+' live';p.className='pill ok';ws.send(JSON.stringify(sub))};
+    ws.onmessage=e=>{try{fn(JSON.parse(e.data))}catch(x){}};
+    ws.onclose=()=>{p.textContent=name+' reconnecting…';p.className='pill bad';setTimeout(go,2000)};
+    ws.onerror=()=>ws.close()})();}
+function sub2(sym){return {method:'subscribe',params:{channel:'book',symbol:[sym],depth:DEPTH}}}
+conn('wss://ws.kraken.com/v2',sub2('XRP/USD'),m=>{
+  if(m.channel==='book'&&m.data){const d=m.data[0];
+    if(m.type==='snapshot'){S.b.clear();S.a.clear()}
+    for(const l of d.bids)l.qty===0?S.b.delete(l.price):S.b.set(l.price,l.qty);
+    for(const l of d.asks)l.qty===0?S.a.delete(l.price):S.a.set(l.price,l.qty);S.ready=1}
+  else if(m.channel==='trade'&&m.type==='update')for(const t of m.data)S.tr.push({t:Date.parse(t.timestamp),p:t.price,q:t.qty,s:t.side});
+},'p1','Kraken L2');
+// second Kraken subscription for trades
+(function(){const ws=new WebSocket('wss://ws.kraken.com/v2');
+ ws.onopen=()=>ws.send(JSON.stringify({method:'subscribe',params:{channel:'trade',symbol:['XRP/USD']}}));
+ ws.onmessage=e=>{try{const m=JSON.parse(e.data);if(m.channel==='trade'&&m.type==='update')for(const t of m.data)S.tr.push({t:Date.parse(t.timestamp),p:t.price,q:t.qty,s:t.side})}catch(x){}};
+ ws.onclose=()=>setTimeout(arguments.callee,3000)})();
+// Level 3 (Bitstamp live_orders)
+conn('wss://ws.bitstamp.net',{event:'bts:subscribe',data:{channel:'live_orders_xrpusd'}},m=>{
+  if(!m.event||m.event.indexOf('order_')!==0)return;
+  const d=m.data,id=d.id_str||String(d.id),now=Date.now(),usd=d.amount*d.price,side=d.order_type==0?'B':'S';
+  let type='NEW',life=null;
+  if(m.event==='order_created')S.ord.set(id,{t:now,side});
+  else if(m.event==='order_deleted'){type='CANCEL';const o=S.ord.get(id);if(o){life=now-o.t;S.ord.delete(id)}}
+  else type='CHG';
+  S.ev.push({t:now,type,fast:life!==null&&life<3000});
+  if(S.ord.size>20000){S.ord.delete(S.ord.keys().next().value)}
+  if(usd>=+$('whale').value)addFeed(type,side,d.price,d.amount,usd,life);
+},'p2','Bitstamp L3');
+function addFeed(type,side,p,q,usd,life){
+  const c={NEW:'#4da3ff',CANCEL:'#ffb454',CHG:'#7f8aa3'}[type],d=document.createElement('div');
+  d.dataset.tip=({NEW:'A new order was placed on the book.',CANCEL:'Order removed: cancelled OR filled (not distinguishable). '+(life!==null?'It lived '+(life/1000).toFixed(1)+'s. Very short lives of big orders can mean spoofing/flashing.':''),CHG:'Order size was modified.'})[type];
+  d.innerHTML=`<span style="color:${c}">${type.padEnd(6,'\u00a0')}</span><span class="${side=='B'?'bd':'a'}">${side=='B'?'BUY ':'SELL'}</span> ${fp(p)} · ${fm(q)} XRP · <b>$${fm(usd)}</b>${life!==null?' · '+(life/1000).toFixed(1)+'s':''}`;
+  const f=$('feed');f.prepend(d);while(f.children.length>80)f.lastChild.remove();}
+// ---------- 1-second snapshot
+function tick(){
+  if(!S.ready||!S.b.size||!S.a.size)return;
+  const B=[...S.b].sort((x,y)=>y[0]-x[0]).slice(0,DEPTH),A=[...S.a].sort((x,y)=>x[0]-y[0]).slice(0,DEPTH);
+  S.b=new Map(B);S.a=new Map(A);
+  const bb=B[0][0],ba=A[0][0],mid=(bb+ba)/2;S.mid=mid;
+  const arr=[];for(const [p,q] of B)if(p>mid*.95)arr.push(p,q);for(const [p,q] of A)if(p<mid*1.05)arr.push(p,q);
+  S.cols.push({t:Date.now(),mid,d:new Float32Array(arr)});if(S.cols.length>MAXC)S.cols.shift();
+  const now=Date.now();S.tr=S.tr.filter(t=>now-t.t<MAXC*1000);S.ev=S.ev.filter(e=>now-e.t<60000);
+  // stats
+  const sum=(L,f)=>L.filter(f).reduce((s,[p,q])=>s+p*q,0),bd=sum(B,l=>l[0]>=mid*.99),ad=sum(A,l=>l[0]<=mid*1.01);
+  const wall=(L,lim)=>L.filter(l=>lim(l[0])).reduce((m,l)=>l[0]*l[1]>m[1]?[l[0],l[0]*l[1]]:m,[0,0]);
+  const bw=wall(B,p=>p>=mid*.98),aw=wall(A,p=>p<=mid*1.02),imb=bd/(bd+ad)*100;
+  let net=0;for(const t of S.tr)if(now-t.t<3e5)net+=(t.s==='buy'?1:-1)*t.p*t.q;
+  sv('mid','$'+fp(mid));sv('spr',((ba-bb)/mid*1e4).toFixed(1)+' bp');
+  sv('imb',imb.toFixed(0)+'% buy',imb>55?'var(--g)':imb<45?'var(--r)':'');
+  sv('bd','$'+fm(bd),'var(--g)');sv('ad','$'+fm(ad),'var(--r)');
+  sv('bw',bw[1]?fp(bw[0])+' · $'+fm(bw[1]):'–','var(--g)');sv('aw',aw[1]?fp(aw[0])+' · $'+fm(aw[1]):'–','var(--r)');
+  sv('cvd',(net>=0?'+':'−')+'$'+fm(Math.abs(net)),net>=0?'var(--g)':'var(--r)');
+  // ladder
+  const N=9,as=A.slice(0,N).reverse(),bs=B.slice(0,N),mx=Math.max(...as.concat(bs).map(l=>l[1]));
+  const row=(l,c)=>`<div class="row ${c}" data-tip="${c=='a'?'Sell':'Buy'} orders at ${fp(l[0])}: ${fm(l[1])} XRP (≈ $${fm(l[0]*l[1])}) waiting."><i style="width:${l[1]/mx*100}%"></i><span>${fp(l[0])}</span><span>${fm(l[1])}</span><span>$${fm(l[0]*l[1])}</span></div>`;
+  $('lad').innerHTML=as.map(l=>row(l,'a')).join('')+`<div class="sp" data-tip="Spread: distance between best sell and best buy.">spread ${fp(ba-bb)}</div>`+bs.map(l=>row(l,'bd')).join('');
+  // L3 stats
+  const nw=S.ev.filter(e=>e.type==='NEW').length,cx=S.ev.filter(e=>e.type==='CANCEL'),fast=cx.filter(e=>e.fast).length;
+  $('l3s').innerHTML=`<span data-tip="Orders placed in the last 60 seconds on Bitstamp.">New/min <b>${nw}</b></span><span data-tip="Orders removed in the last 60 seconds (cancelled or filled).">Removed/min <b>${cx.length}</b></span>
+  <span data-tip="Share of removals that were NEW orders living under 3 seconds. A very high % usually means bots quoting/flashing, not real intent.">Fast-cancel <b>${cx.length?Math.round(fast/cx.length*100):0}%</b></span><span data-tip="Individual orders currently tracked since you opened the page.">Tracked <b>${S.ord.size}</b></span>`;
+  if(!S.paused)draw();}
+setInterval(tick,1000);
+// ---------- heatmap
+const LUT=(()=>{const st=[[0,8,10,25],[.15,20,40,130],[.4,0,170,200],[.65,250,220,40],[.85,255,100,30],[1,255,255,255]],o=[];
+ for(let i=0;i<256;i++){const v=i/255;let k=1;while(st[k][0]<v)k++;const a=st[k-1],b=st[k],f=(v-a[0])/(b[0]-a[0]);
+ o.push(`rgb(${a[1]+(b[1]-a[1])*f|0},${a[2]+(b[2]-a[2])*f|0},${a[3]+(b[3]-a[3])*f|0})`)}return o})();
+const cv=$('c'),ov=$('o'),cx=cv.getContext('2d'),ox=ov.getContext('2d');
+function size(){const r=$('hm').getBoundingClientRect(),d=devicePixelRatio||1;for(const c of[cv,ov]){c.width=r.width*d;c.height=r.height*d}
+ cx.setTransform(d,0,0,d,0,0);ox.setTransform(d,0,0,d,0,0);S.W=r.width;S.H=r.height;draw()}
+addEventListener('resize',size);
+['rng','gam','whale'].forEach(i=>$(i).oninput=draw);
+$('pause').onclick=e=>{S.paused=!S.paused;e.target.textContent=S.paused?'Resume':'Pause';if(!S.paused)draw()};
+function draw(){
+  const W=S.W,H=S.H,n=S.cols.length;if(!W||!n)return;
+  const PW=W-64,PH=H-20,R=+$('rng').value,g=+$('gam').value,mid=S.mid,lo=mid*(1-R),hi=mid*(1+R),rows=Math.max(20,PH/3|0),cw=PW/MAXC;
+  S.view={PW,PH,lo,hi,rows,cw};
+  cx.fillStyle='#05070c';cx.fillRect(0,0,W,H);
+  S.cache=S.cols.map(c=>{const r=new Float32Array(rows);const d=c.d;
+    for(let i=0;i<d.length;i+=2){const p=d[i];if(p<lo||p>=hi)continue;r[(p-lo)/(hi-lo)*rows|0]+=p*d[i+1]}return r});
+  const vals=[];for(const r of S.cache)for(let i=0;i<rows;i++)if(r[i]>0)vals.push(r[i]);
+  vals.sort((a,b)=>a-b);const mx=vals[vals.length*.985|0]||1;S.mx=mx;
+  const rh=PH/rows;
+  S.cache.forEach((r,ci)=>{const x=PW-(n-ci)*cw;
+    for(let i=0;i<rows;i++){const v=r[i];if(v<=0)continue;const k=Math.min(1,Math.pow(v/mx,g));if(k<.03)continue;
+      cx.fillStyle=LUT[k*255|0];cx.fillRect(x,PH-(i+1)*rh,cw+.6,rh+.6)}});
+  const Y=p=>PH-(p-lo)/(hi-lo)*PH,X=t=>PW-(Date.now()-t)/1000*cw;
+  cx.strokeStyle='rgba(255,255,255,.85)';cx.lineWidth=1.3;cx.beginPath();
+  S.cols.forEach((c,i)=>{const x=PW-(n-i)*cw+cw/2;i?cx.lineTo(x,Y(c.mid)):cx.moveTo(x,Y(c.mid))});cx.stroke();
+  for(const t of S.tr){const x=X(t.t),y=Y(t.p);if(x<0||y<0||y>PH)continue;
+    cx.fillStyle=t.s==='buy'?'rgba(38,208,124,.75)':'rgba(255,77,94,.75)';cx.strokeStyle='#000';cx.lineWidth=.5;
+    cx.beginPath();cx.arc(x,y,Math.min(12,2+Math.sqrt(t.p*t.q/400)),0,7);cx.fill();cx.stroke()}
+  cx.fillStyle='#0b0e14';cx.fillRect(PW,0,64,H);cx.fillRect(0,PH,W,20);cx.fillStyle='#9aa6bf';cx.font='11px ui-monospace,monospace';
+  for(let i=0;i<=6;i++){const p=lo+(hi-lo)*i/6;cx.fillText(fp(p),PW+4,Y(p)+4)}
+  for(let m=0;m*60<MAXC;m+=3){const x=PW-m*60*cw;if(x>20)cx.fillText(m?'-'+m+'m':'now',x-12,H-6)}
+  cx.fillStyle='#fff';cx.fillRect(PW,Y(mid)-8,64,16);cx.fillStyle='#000';cx.fillText(fp(mid),PW+4,Y(mid)+4);
+  hover();}
+// ---------- hover on heatmap
+ov.onmousemove=e=>{const r=ov.getBoundingClientRect();S.mouse={x:e.clientX-r.left,y:e.clientY-r.top,cx:e.clientX,cy:e.clientY};hover()};
+ov.onmouseleave=()=>{S.mouse=null;hover()};
+function hover(){
+  ox.clearRect(0,0,S.W,S.H);const m=S.mouse,v=S.view;
+  if(!m||!v||m.x>v.PW||m.y>v.PH){if(m)tip.style.display='none';return}
+  ox.strokeStyle='rgba(255,255,255,.5)';ox.setLineDash([4,4]);ox.beginPath();ox.moveTo(m.x,0);ox.lineTo(m.x,v.PH);ox.moveTo(0,m.y);ox.lineTo(v.PW,m.y);ox.stroke();
+  const n=S.cols.length,ci=n-Math.ceil((v.PW-m.x)/v.cw),ri=Math.min(v.rows-1,(v.PH-m.y)/v.PH*v.rows|0);
+  const price=v.lo+(v.hi-v.lo)*(v.PH-m.y)/v.PH,rh=(v.hi-v.lo)/v.rows;
+  let txt=`Price ${fp(price)}`;
+  if(ci>=0&&ci<n){const val=S.cache[ci]?S.cache[ci][ri]:0,age=Math.round((Date.now()-S.cols[ci].t)/1000);
+    txt+=`\n${age}s ago · ${new Date(S.cols[ci].t).toLocaleTimeString()}\nResting orders here: $${fm(val)}\n(${val/S.mx>.7?'BIG wall — strong liquidity':val/S.mx>.3?'Medium liquidity':val>0?'Light liquidity':'Empty'}; ${price<S.cols[ci].mid?'buy side':'sell side'})`;}
+  tip.style.whiteSpace='pre-line';tip.textContent=txt;tip.style.display='block';
+  tip.style.left=Math.min(m.cx+14,innerWidth-300)+'px';tip.style.top=Math.min(m.cy+16,innerHeight-110)+'px';}
+// help legend inside heatmap
+$('hm').dataset.tip='';
+size();
+</script></body></html>
