@@ -2,13 +2,13 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>XRP/USD Order Book Heatmap</title>
 <style>
-:root{--bg:#0b0e14;--p:#121722;--b:#222a3a;--t:#d7deea;--m:#7f8aa3;--g:#26d07c;--r:#ff4d5e;--a:#4da3ff}
+:root{--bg:#f6f7f9;--p:#fff;--b:#e3e6ec;--t:#2b3240;--m:#6b7487;--g:#2f8f6b;--r:#c4575e;--a:#3d6fb6}
 *{box-sizing:border-box}html,body{height:100%;margin:0}
-body{background:var(--bg);color:var(--t);font:13px/1.35 system-ui,-apple-system,Segoe UI,sans-serif;display:flex;flex-direction:column;overflow:auto}
+body{background:var(--bg);color:var(--t);font:14px/1.45 system-ui,-apple-system,Segoe UI,sans-serif;display:flex;flex-direction:column;overflow:auto}
 header{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:8px 12px;border-bottom:1px solid var(--b)}
 h1{font-size:15px;margin:0 8px 0 0}
 .pill{padding:2px 9px;border-radius:99px;border:1px solid var(--b);color:var(--m);cursor:help}
-.pill.ok{color:var(--g);border-color:#1a5a3b}.pill.bad{color:var(--r);border-color:#6b2630}
+.pill.ok{color:var(--g);border-color:#a9d9c3}.pill.bad{color:var(--r);border-color:#e3b0b4}
 .ctl{display:flex;align-items:center;gap:5px;color:var(--m)}
 select,input,button{background:var(--p);color:var(--t);border:1px solid var(--b);border-radius:6px;padding:3px 6px;font:inherit}
 button{cursor:pointer}input[type=range]{padding:0;width:80px}input[type=number]{width:80px}
@@ -16,7 +16,7 @@ button{cursor:pointer}input[type=range]{padding:0;width:80px}input[type=number]{
 .card{background:var(--p);border:1px solid var(--b);border-radius:8px;padding:6px 10px;cursor:help}
 .card small{color:var(--m);display:block}.card b{font-size:16px}
 main{flex:1;display:flex;gap:8px;padding:0 12px 8px;min-height:480px}
-#hm{flex:1;position:relative;background:#05070c;border:1px solid var(--b);border-radius:8px;min-width:0}
+#hm{flex:1;position:relative;background:#fbfcfe;border:1px solid var(--b);border-radius:8px;min-width:0}
 #hm canvas{position:absolute;inset:0;width:100%;height:100%}
 aside{width:310px;display:flex;flex-direction:column;gap:8px;min-height:0}
 .box{background:var(--p);border:1px solid var(--b);border-radius:8px;padding:6px 8px;overflow:hidden}
@@ -29,11 +29,12 @@ aside{width:310px;display:flex;flex-direction:column;gap:8px;min-height:0}
 .sp{text-align:center;color:var(--m);font-size:11px;padding:2px}
 #feedbox{flex:1;display:flex;flex-direction:column;min-height:120px}
 #feed{overflow:auto;flex:1;font:11.5px ui-monospace,Menlo,monospace}
-#feed div{padding:1px 0;border-bottom:1px solid #1a2130;white-space:nowrap}
+#feed div{padding:1px 0;border-bottom:1px solid #eceff4;white-space:nowrap}
 #l3s{display:grid;grid-template-columns:1fr 1fr;gap:2px 8px;color:var(--m);font-size:12px;margin-bottom:4px}
 #l3s b{color:var(--t)}
-#tip{position:fixed;z-index:9;background:#1d2538;border:1px solid #38466a;border-radius:6px;padding:6px 9px;max-width:290px;pointer-events:none;display:none;box-shadow:0 4px 18px #000a}
+#tip{position:fixed;z-index:9;background:#2b3240;color:#fff;border:1px solid #2b3240;border-radius:6px;padding:6px 9px;max-width:290px;pointer-events:none;display:none;box-shadow:0 4px 18px #0003}
 #tip{white-space:pre-line}
+.gg{color:var(--g)}.rr{color:var(--r)}
 em.n{color:var(--m);font-size:10.5px;font-style:normal;font-weight:400;text-transform:none;letter-spacing:0}
 #hmw{flex:1;display:flex;flex-direction:column;min-width:0;gap:4px}
 .hmh{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center}
@@ -43,9 +44,9 @@ em.n{color:var(--m);font-size:10.5px;font-style:normal;font-weight:400;text-tran
 #intro summary{cursor:pointer;font-weight:600}
 #intro .g{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}
 #intro h4{margin:8px 0 4px;color:var(--a)}#intro p{margin:0 0 6px}#intro ul{margin:0 0 6px;padding-left:18px}
-.bar{height:12px;border-radius:6px;background:linear-gradient(90deg,#080a19,#142882,#00aac8,#fadc28,#ff641e,#fff)}
+.bar{height:12px;border-radius:6px;background:linear-gradient(90deg,#f4f6fa,#d6e2f4,#96b4de,#466eb4,#192d5f)}
 .bl{display:flex;justify-content:space-between;color:var(--m);font-size:11px}
-#sum{margin:8px 12px 0;padding:8px 12px;background:#2a2614;border:1px solid #5a4d1a;color:#ffe9a8;border-radius:8px;line-height:1.5}
+#sum{margin:8px 12px 0;padding:8px 12px;background:#eef3fb;border:1px solid #d5e0f2;color:var(--t);border-radius:8px;line-height:1.5}
 footer{padding:4px 12px 8px;color:var(--m);font-size:11px}
 @media(max-width:900px){main{flex-direction:column;overflow:auto}#hm{min-height:380px;flex:none}#hmw{flex:none}aside{width:auto}}
 </style></head><body>
@@ -53,42 +54,40 @@ footer{padding:4px 12px 8px;color:var(--m);font-size:11px}
 <h1>XRP/USD · Order Book Heatmap</h1>
 <span class="pill" id="p1" data-tip="Level 2 feed (total size waiting at each price) plus trades, from Kraken (a crypto exchange). Green = working. Red = trying to reconnect.">Kraken L2 …</span>
 <span class="pill" id="p2" data-tip="Level 3 feed (every individual order placed, changed or cancelled) from Bitstamp (another exchange). Green = working. Red = trying to reconnect.">Bitstamp L3 …</span>
-<label class="ctl" data-tip="How much price range the chart shows above and below today's price. ±1% means you see prices from 1% below to 1% above. Pick a smaller number to zoom in.">Range <em class="n">(zoom)</em>
+<label class="ctl" data-tip="How much price range the chart shows above and below today's price. ±1% means you see prices from 1% below to 1% above. Pick a smaller number to zoom in.">Zoom <em class="n">(price range)</em>
 <select id="rng"><option value=.005>±0.5%</option><option value=.01 selected>±1%</option><option value=.02>±2%</option><option value=.05>±5%</option></select></label>
-<label class="ctl" data-tip="Makes the colors brighter or dimmer. Slide left to also see small orders. Slide right to see only the very biggest ones.">Contrast <em class="n">(brightness)</em>
+<label class="ctl" data-tip="Makes the colors brighter or dimmer. Slide left to also see small orders. Slide right to see only the very biggest ones.">Brightness <em class="n">(contrast)</em>
 <input id="gam" type="range" min=".25" max="1" step=".05" value=".6"></label>
-<label class="ctl" data-tip="Only single orders worth at least this many US dollars are listed in the live orders box on the right. Very big orders are nicknamed whales. Lower the number to see more orders. For you: whales can move price far more than a small account ever will, so watching them helps you avoid trading against them.">Whale ≥ $ <em class="n">(big orders only)</em>
+<label class="ctl" data-tip="Only single orders worth at least this many US dollars are listed in the live orders box on the right. Very big orders are nicknamed whales. Lower the number to see more orders. For you: whales can move price far more than a small account ever will, so watching them helps you avoid trading against them.">Show orders over $ <em class="n">(“whales”)</em>
 <input id="whale" type="number" value="25000" step="5000" min="0"></label>
 <button id="pause" data-tip="Freeze the picture so you can study it. Data keeps recording in the background; press Resume to catch up.">Pause</button>
 </header>
-<details id="intro" open><summary>👋 New here? Read this first (1 minute). Click to hide or show.</summary>
+<details id="intro" open><summary>👋 Start here: how to read this in 1 minute (click to hide or show)</summary>
 <div class="g">
-<div><h4>1 · What am I looking at?</h4><p>On an exchange, people place <b>orders</b>: “I will buy XRP at this price” or “I will sell XRP at this price”. Orders wait in a list until someone agrees to trade. That waiting list is called the <b>order book</b>. This page turns it into a moving picture so you can see where lots of buyers and sellers are waiting.</p></div>
-<div><h4>2 · How to read the big picture</h4><ul><li><b>Left → right</b> = time. The right edge is right now.</li><li><b>Up ↑ / down ↓</b> = price in US dollars. Higher on screen = higher price.</li><li><b>Color</b> = how many dollars of orders are waiting at that price (bar below).</li><li><b>White line</b> = the actual price over time.</li><li><b>Circles</b> = real trades that just happened. Green = a buyer, red = a seller. Bigger = more money.</li></ul>
-<div class="bar"></div><div class="bl"><span>few orders</span><span>some</span><span>lots of orders</span></div></div>
-<div><h4>3 · Why do traders care?</h4><ul><li>A bright stripe <b>below</b> the price = many buyers waiting there. Price often has trouble falling through it. Called a <b>floor</b> (or “support”).</li><li>A bright stripe <b>above</b> the price = many sellers waiting. Price often has trouble rising through it. Called a <b>ceiling</b> (or “resistance”).</li><li><b>Warning:</b> people can cancel orders any second, so these are clues, not promises.</li></ul></div>
-<div><h4>4 · Tips</h4><ul><li>Hover your mouse over <b>anything</b> for a plain-English explanation.</li><li>The yellow line below the numbers summarizes the situation every second.</li><li>Use <b>Pause</b> to freeze the picture and <b>Zoom</b> to look closer to the price.</li></ul>
-<details><summary>Mini dictionary</summary><p><b>XRP</b>: a cryptocurrency. <b>USD</b>: US dollars. <b>Buy order (bid)</b>: an offer to buy at a set price. <b>Sell order (ask)</b>: an offer to sell at a set price. <b>Spread</b>: the gap between the best buy and best sell price. <b>Wall</b>: a very large order, or stack of orders, at one price. <b>Level 2</b>: all orders added up at each price. <b>Level 3</b>: every single order, one by one. <b>Whale</b>: someone moving a very large amount of money. <b>Liquidity</b>: how much is available to trade at a price. <b>Bid / Ask depth</b>: total money waiting on the buy / sell side. <b>Imbalance</b>: how lopsided buyers vs sellers are. <b>Basis point (bp)</b>: 0.01%. <b>Market buy / sell</b>: trading immediately at the best available price. <b>Net flow (CVD)</b>: market buys minus market sells. <b>Spoofing</b>: placing big fake orders to fool others, then cancelling them.</p></details></div>
-<div><h4>5 · What this means for you (small account)</h4><ul>
-<li><b>Use limit orders, not market orders.</b> A limit order sets the price you accept. Market orders on thin books can fill at a worse price (that loss is called slippage).</li>
-<li><b>Small is an advantage.</b> Your order is tiny next to the walls, so you can get in and out quickly without moving the price. Big players cannot.</li>
-<li><b>Thin book = fast jumps.</b> When bid or ask depth is low, keep your size smaller and use a stop-loss.</li>
-<li><b>Do not trust walls that vanish.</b> If Fast-cancel is high, many big orders are probably fake.</li>
-<li><b>Fees matter more for small accounts.</b> Compare your exchange fee plus the spread with what you hope to earn.</li>
-<li><b>Your exchange may differ slightly.</b> This shows Kraken and Bitstamp. XRP prices on other exchanges usually follow them closely, but check yours.</li>
-<li>No chart predicts the future. Only risk money you can afford to lose.</li></ul></div>
+<div><h4>The idea</h4><p>People who want to buy or sell XRP leave offers on an exchange and wait. Like “I’ll buy at $2.00” or “I’ll sell at $2.10”. All those waiting offers together are called the <b>order book</b>. This page draws them as a picture.</p></div>
+<div><h4>The picture</h4><ul><li><b>Sideways</b> = time. The right edge is now.</li><li><b>Up and down</b> = price. Higher on screen = higher price.</li><li><b>Darker blue</b> = more money waiting at that price.</li><li><b>Dark line</b> = the real price.</li><li><b>Small circles</b> = real trades. Green = someone bought. Red = someone sold.</li></ul><div class="bar"></div><div class="bl"><span>almost nothing</span><span>a lot waiting</span></div></div>
+<div><h4>Why it helps</h4><ul><li>A dark patch <b>under</b> the price = lots of buyers waiting. Price often slows or bounces there. Called a <b>floor</b>.</li><li>A dark patch <b>over</b> the price = lots of sellers waiting. Price often slows there. Called a <b>ceiling</b>.</li><li>Offers can be cancelled any second. Treat them as clues, not promises.</li><li>Hover your mouse over <b>anything</b> to get a simple explanation.</li></ul></div>
+<div><h4>If you have a small account</h4><ul>
+<li><b>Use limit orders.</b> You pick the price. A market order takes whatever price is there, which can be worse on a thin market (that loss is called slippage).</li>
+<li><b>Small is an advantage.</b> Your amount is tiny next to the big piles, so you can get in and out without moving the price.</li>
+<li><b>Few offers = fast jumps.</b> Use a smaller amount and a stop-loss.</li>
+<li><b>Be careful with piles that vanish.</b> If “Gone in 3s” is high, many big offers are probably fake.</li>
+<li><b>Fees matter more.</b> Add your exchange fee and the price gap, and compare with what you hope to earn.</li>
+<li><b>Your exchange may differ a little.</b> This shows Kraken and Bitstamp. Check your own price.</li>
+<li>No chart can predict the future. Only risk money you can afford to lose.</li></ul></div>
+<div><h4>Mini dictionary</h4><p><b>XRP</b>: a cryptocurrency. <b>USD</b>: US dollars. <b>Buy offer (bid)</b>: an offer to buy at a set price. <b>Sell offer (ask)</b>: an offer to sell at a set price. <b>Price gap (spread)</b>: the gap between the best buy and best sell price. <b>Wall</b>: a big pile of offers at one price. <b>Level 2</b>: all offers added up at each price. <b>Level 3</b>: every single offer separately. <b>Whale</b>: someone moving a lot of money. <b>Liquidity</b>: how easy it is to trade without moving the price. <b>Imbalance</b>: how lopsided buyers vs sellers are. <b>Basis point</b>: 0.01%. <b>Market order</b>: buy or sell right now at whatever price is available. <b>Limit order</b>: you choose the price and wait. <b>Net flow (CVD)</b>: rushed buying minus rushed selling. <b>Spoofing</b>: placing big fake offers to fool others, then cancelling them.</p></div>
 </div></details>
 <div id="sum">Connecting to live data…</div>
 <section id="stats"></section>
 <main>
 <div id="hmw"><div class="hmh">
-<b data-tip="Each column is a snapshot of the Level 2 order book taken once per second. Together they show how walls of orders appear, move and disappear over about 15 minutes.">Liquidity heatmap · Level 2 depth over time <em class="n">(where buyers and sellers are waiting, and how it changes)</em> <em class="n"><b style="color:#ffe9a8">What it means for you:</b> bright stripes are places where price may pause or bounce, so they help you pick calmer spots to enter or exit, and help you avoid chasing price when there is a big wall in the way.</em></b>
-<span class="lg" data-tip="Color key. Dark = almost nothing waiting at that price. Blue/cyan = some. Yellow/orange = a lot. White = the very largest piles of orders."><span>few orders</span><i class="bar"></i><span>lots</span></span>
-<span data-tip="Circles are real trades (market orders) from Kraken. Green = a buyer took the price up, red = a seller hit the price down. Bigger circle = more money.">🟢 market buy · 🔴 market sell · ⚪ price</span></div>
+<b data-tip="Each column is a snapshot of all waiting offers, taken once per second. Together they show how piles of offers appear, move and disappear over about 15 minutes.">Picture of waiting offers over time <em class="n">(Level 2 liquidity heatmap)</em></b> <em class="n"><b>For you:</b> dark patches are spots where price may slow down or bounce. Good places to think about getting in or out, and a warning not to chase price into a big pile.</em></b>
+<span class="lg" data-tip="Color key. Pale = almost nothing waiting at that price. Darker blue = more money waiting. Darkest = the biggest piles."><span>almost nothing</span><i class="bar"></i><span>a lot waiting</span></span>
+<span data-tip="Circles are real trades (market orders) from Kraken. Green = a buyer took the price up, red = a seller hit the price down. Bigger circle = more money."><span class="gg">●</span> green = someone bought · <span class="rr">●</span> red = someone sold · dark line = price</span></div>
 <div id="hm"><canvas id="c"></canvas><canvas id="o"></canvas></div></div>
 <aside>
-<div class="box"><h3 data-tip="Every price where people are waiting to trade, from Kraken. Red rows on top = people wanting to SELL (at higher prices). Green rows below = people wanting to BUY (at lower prices). Longer bar = more money waiting at that price. For you: if the rows nearest the middle are thin, a market order can slip to a worse price, so use a limit order.">Order book ladder · Level 2 <em class="n">(waiting orders list)</em></h3><div id="lad"></div></div>
-<div class="box" id="feedbox"><h3 data-tip="Level 3 = individual orders, one by one (Level 2 only shows totals per price). Source: Bitstamp, the only major exchange giving this free with no login. NEW = order placed. CANCEL = removed (cancelled OR filled; the feed cannot tell which). CHG = size changed. Only orders above your Whale threshold are listed. For you: many big orders appearing and vanishing within seconds are usually bots, so do not base a trade on them.">Level 3 · individual orders (Bitstamp) <em class="n">(every single order, live)</em></h3><div style="color:var(--m);font-size:11px;margin-bottom:3px">NEW = placed · CANCEL = cancelled or filled · CHG = size changed · 🐋 = very large</div>
+<div class="box"><h3 data-tip="Every price where people are waiting to trade, from Kraken. Red rows on top = people wanting to SELL (at higher prices). Green rows below = people wanting to BUY (at lower prices). Longer bar = more money waiting at that price. For you: if the rows nearest the middle are thin, a market order can slip to a worse price, so use a limit order.">Waiting offers list <em class="n">(order book, Level 2)</em></h3><div id="lad"></div></div>
+<div class="box" id="feedbox"><h3 data-tip="Level 3 = individual orders, one by one (Level 2 only shows totals per price). Source: Bitstamp, the only major exchange giving this free with no login. NEW = order placed. CANCEL = removed (cancelled OR filled; the feed cannot tell which). CHG = size changed. Only orders above your Whale threshold are listed. For you: many big orders appearing and vanishing within seconds are usually bots, so do not base a trade on them.">Live offers, one by one <em class="n">(Level 3, from Bitstamp)</em></h3><div style="color:var(--m);font-size:11px;margin-bottom:3px">NEW = someone placed an offer · CANCEL = offer removed (cancelled or traded) · CHG = offer changed size · 🐋 = very big</div>
 <div id="l3s"></div><div id="feed"></div></div>
 </aside></main>
 <footer>Data: Kraken (Level 2 + trades) and Bitstamp (Level 3) public WebSockets, free, no keys. Shows only these two venues, not the whole XRP market. Educational tool, not financial advice. Never trade money you cannot afford to lose.</footer>
@@ -106,21 +105,21 @@ document.addEventListener('mousemove',e=>{
   tip.textContent=el.dataset.tip;tip.style.display='block';
   tip.style.left=Math.min(e.clientX+14,innerWidth-300)+'px';tip.style.top=Math.min(e.clientY+16,innerHeight-90)+'px';});
 // ---------- stat cards
-const CARDS=[['mid','Mid price','(price now)','The current XRP price: halfway between the best bid (highest price a buyer will pay) and the best ask (lowest price a seller will accept).'],
-['spr','Spread','(gap buyers ↔ sellers)','Gap between best bid and best ask, in basis points (1 bp = 0.01%, so 100 bp = 1%). A tight spread means a liquid, busy market.'],
-['imb','Book imbalance ±1%','(buyers vs sellers)','Share of resting USD within 1% of price that sits on the BUY side. Above 50% = more buyers waiting (supportive). Below 50% = more sellers waiting (pressure). A hint, not a guarantee.'],
-['bd','Bid depth ±1%','(money waiting to buy)','Total USD of buy orders (bids) resting within 1% below price. Bigger = a stronger cushion if price drops.'],
-['ad','Ask depth ±1%','(money waiting to sell)','Total USD of sell orders (asks) resting within 1% above price. Bigger = a stronger lid if price rises.'],
-['bw','Biggest buy wall','(a possible floor)','Largest single price level of buy orders within 2% below (potential support). Shown as price · USD size. Walls can be pulled at any time.'],
-['aw','Biggest sell wall','(a possible ceiling)','Largest single price level of sell orders within 2% above (potential resistance). Shown as price · USD size. Walls can be pulled at any time.'],
-['cvd','Net flow (5 min)','(buying vs selling pressure)','Also called CVD (cumulative volume delta): market buys minus market sells over the last 5 minutes, in USD (Kraken trades). Positive = buyers hitting asks. Negative = sellers hitting bids.']];
-const YOU={mid:'This is roughly the price you will pay or get. On a smaller exchange your fill can differ a bit, so always check the price on your own exchange before you confirm.',
-spr:'The spread is a hidden cost: you buy at the higher price and sell at the lower one. A wide spread means you lose more just by getting in and out. Prefer calm moments when it is tight, and use limit orders.',
-imb:'Lots of buyers waiting can cushion dips. Lots of sellers waiting can cap rallies. Treat it as a mood check, never as a buy or sell signal on its own.',
-bd:'Thick money under the price means drops often get absorbed there. Thin means price can fall fast, so keep your position small and use a stop-loss.',
-ad:'Thick money above the price means rises may stall. Thin means price can jump quickly, so avoid chasing green moves.',
-bw:'Many traders place a buy limit just ABOVE a big buy wall with a stop just BELOW it. Walls can be pulled any second, so never rely on one alone.',
-aw:'Many traders take profit just BELOW a big sell wall. If price pushes through it with strong buying, that can be a sign of strength.',
+const CARDS=[['mid','Price right now','(mid price)','The price XRP is at right now. It sits halfway between the highest price a buyer offers and the lowest price a seller asks.'],
+['spr','Price gap','(spread)','The small gap between what buyers offer and what sellers ask. A small gap is good for you: you lose less when you buy and then sell. (Technical: measured here as a % of the price.)'],
+['imb','Buyers vs sellers','(imbalance)','Out of all the money waiting close to today’s price, this is the share waiting to BUY. Over 50% = more people want to buy. Under 50% = more want to sell. Just a hint, not a promise.'],
+['bd','Money waiting to buy','(bid depth)','Total dollars of buy offers waiting just under the price (within 1%). More = a softer landing if price drops.'],
+['ad','Money waiting to sell','(ask depth)','Total dollars of sell offers waiting just over the price (within 1%). More = price may have a harder time going up.'],
+['bw','Strongest floor','(buy wall)','The one price, within 2% under today’s price, where the most buy offers are piled up. Price often slows or bounces there. The buyer can cancel at any time.'],
+['aw','Strongest ceiling','(sell wall)','The one price, within 2% over today’s price, where the most sell offers are piled up. Price often slows down there. The seller can cancel at any time.'],
+['cvd','Who is rushing (5 min)','(net flow, CVD)','Over the last 5 minutes: dollars from people who bought right away, minus dollars from people who sold right away. Plus (green) = buyers more in a hurry. Minus (red) = sellers more in a hurry.']];
+const YOU={mid:'This is about the price you will get. Your own exchange can be slightly different, so check it before you confirm.',
+spr:'A bigger gap is a hidden cost: you buy at the higher price and sell at the lower one. Use limit orders (you pick the price) and prefer calm moments.',
+imb:'More buyers can soften dips and more sellers can slow rises. Use it as a mood check, never as the only reason to buy or sell.',
+bd:'A lot of money under the price means drops often get caught. Very little means price can fall fast, so use a smaller amount and a stop-loss.',
+ad:'A lot of money over the price means rises may stall. Very little means price can jump, so avoid chasing green moves.',
+bw:'Some traders set a buy offer just above a big floor and a stop-loss just under it. Floors can vanish, so never rely on one alone.',
+aw:'Some traders take profit just under a big ceiling. If price pushes through it with strong buying, that can show strength.',
 cvd:'Shows who is rushing right now. Green while price rises = real buying. Price rising while this is red can be a weak move, so be careful.'};
 $('stats').innerHTML=CARDS.map(c=>`<div class="card" data-tip="${c[3]}
 
@@ -178,25 +177,26 @@ function tick(){
   const wall=(L,lim)=>L.filter(l=>lim(l[0])).reduce((m,l)=>l[0]*l[1]>m[1]?[l[0],l[0]*l[1]]:m,[0,0]);
   const bw=wall(B,p=>p>=mid*.98),aw=wall(A,p=>p<=mid*1.02),imb=bd/(bd+ad)*100;
   let net=0;for(const t of S.tr)if(now-t.t<3e5)net+=(t.s==='buy'?1:-1)*t.p*t.q;
-  sv('mid','$'+fp(mid));sv('spr',((ba-bb)/mid*1e4).toFixed(1)+' bp');
+  sv('mid','$'+fp(mid));sv('spr',((ba-bb)/mid*100).toFixed(3)+'%');
   sv('imb',imb.toFixed(0)+'% buy',imb>55?'var(--g)':imb<45?'var(--r)':'');
   sv('bd','$'+fm(bd),'var(--g)');sv('ad','$'+fm(ad),'var(--r)');
   sv('bw',bw[1]?fp(bw[0])+' · $'+fm(bw[1]):'–','var(--g)');sv('aw',aw[1]?fp(aw[0])+' · $'+fm(aw[1]):'–','var(--r)');
   sv('cvd',(net>=0?'+':'−')+'$'+fm(Math.abs(net)),net>=0?'var(--g)':'var(--r)');
-  const side=imb>58?'Noticeably MORE money is waiting to <b style="color:var(--g)">buy</b> than to sell near the current price, so buyers look stronger right now.':imb<42?'Noticeably MORE money is waiting to <b style="color:var(--r)">sell</b> than to buy near the current price, so sellers look stronger right now.':'Buyers and sellers look about evenly matched near the current price.';
-  const spb=(ba-bb)/mid*1e4,you=(imb>58?'Buyers dominate, so dips may be shallower. Still, it is usually calmer to let price come to your limit order than to chase it.':imb<42?'Sellers dominate, so rallies may stall. Patience or a smaller size is often safer.':'The book gives no clear edge right now, so there is no pressure to act. Waiting is a valid choice.')+(spb>10?' The spread is wide right now, so use limit orders to avoid overpaying.':''); const flow=Math.abs(net)<2000?'Recent trades (last 5 min) are balanced between buying and selling.':net>0?'In the last 5 minutes, people who bought in a hurry outweighed people who sold in a hurry.':'In the last 5 minutes, people who sold in a hurry outweighed people who bought in a hurry.';
-  $('sum').innerHTML=`📌 <b>In plain English, right now:</b> XRP costs about <b>$${fp(mid)}</b>. ${side} The biggest <b>floor</b> (pile of buyers) below is near <b>$${bw[1]?fp(bw[0]):'–'}</b> and the biggest <b>ceiling</b> (pile of sellers) above is near <b>$${aw[1]?fp(aw[0]):'–'}</b>. ${flow} <br>💡 <b>What it means for you (small account):</b> ${you}<br><i>This describes what is happening. It does not predict the future or tell you what to do.</i>`;
+  const side=imb>58?'More money is waiting to <b class="gg">buy</b> than to sell near today’s price. Buyers look a bit stronger.':imb<42?'More money is waiting to <b class="rr">sell</b> than to buy near today’s price. Sellers look a bit stronger.':'Buyers and sellers look about equal right now.';
+  const spb=(ba-bb)/mid*1e4,you=(imb>58?'Dips may be softer, but it is usually calmer to let the price come to your offer than to chase it.':imb<42?'Rises may stall. Being patient or using a smaller amount is often safer.':'Nothing stands out, so there is no need to rush. Waiting is okay.')+(spb>10?' The price gap is wide right now, so use limit orders (you choose the price).':'');
+  const flow=Math.abs(net)<2000?'In the last 5 minutes, buying and selling were about even.':net>0?'In the last 5 minutes, more people rushed to buy than rushed to sell.':'In the last 5 minutes, more people rushed to sell than rushed to buy.';
+  $('sum').innerHTML=`<b>In simple words, right now:</b> XRP is about <b>$${fp(mid)}</b>. ${side} ${flow}<br>Strongest floor (pile of buyers) is near <b>$${bw[1]?fp(bw[0]):'–'}</b>. Strongest ceiling (pile of sellers) is near <b>$${aw[1]?fp(aw[0]):'–'}</b>.<br>💡 <b>For you:</b> ${you}<br><i>This is a description of what is happening. It is not a prediction and not advice.</i>`;
   // ladder
   const N=9,as=A.slice(0,N).reverse(),bs=B.slice(0,N),mx=Math.max(...as.concat(bs).map(l=>l[1]));
   const row=(l,c)=>`<div class="row ${c}" data-tip="${c=='a'?'Sell':'Buy'} orders at ${fp(l[0])}: ${fm(l[1])} XRP (≈ $${fm(l[0]*l[1])}) waiting."><i style="width:${l[1]/mx*100}%"></i><span>${fp(l[0])}</span><span>${fm(l[1])}</span><span>$${fm(l[0]*l[1])}</span></div>`;
-  $('lad').innerHTML='<div class="row" style="color:var(--m)"><span>Price</span><span>Size (XRP)</span><span>Value (USD)</span></div>'+as.map(l=>row(l,'a')).join('')+`<div class="sp" data-tip="The gap between the cheapest seller (above) and the highest-paying buyer (below). Smaller gap = busier market.">spread ${fp(ba-bb)} <em class="n">(gap between best buy &amp; best sell)</em></div>`+bs.map(l=>row(l,'bd')).join('');
+  $('lad').innerHTML='<div class="row" style="color:var(--m)"><span>Price</span><span>Amount (XRP)</span><span>Worth ($)</span></div>'+as.map(l=>row(l,'a')).join('')+`<div class="sp" data-tip="The gap between the cheapest seller (above) and the highest-paying buyer (below). Smaller gap = busier market.">price gap ${fp(ba-bb)} <em class="n">(spread)</em></div>`+bs.map(l=>row(l,'bd')).join('');
   // L3 stats
   const nw=S.ev.filter(e=>e.type==='NEW').length,cx=S.ev.filter(e=>e.type==='CANCEL'),fast=cx.filter(e=>e.fast).length;
-  $('l3s').innerHTML=`<span data-tip="Orders placed on Bitstamp in the last 60 seconds. Shows how busy the market is.">New/min <em class="n">(placed)</em> <b>${nw}</b></span><span data-tip="Orders that disappeared in the last 60 seconds (cancelled or filled).">Removed/min <b>${cx.length}</b></span><span data-tip="Share of removed orders that lived under 3 seconds. A very high % usually means bots quoting or flashing (spoofing), so big walls may be fake.">Fast-cancel <em class="n">(&lt;3s)</em> <b>${cx.length?Math.round(fast/cx.length*100):0}%</b></span><span data-tip="Individual orders this page is currently tracking since you opened it.">Tracked <em class="n">(orders)</em> <b>${S.ord.size}</b></span>`;
+  $('l3s').innerHTML=`<span data-tip="New offers placed on Bitstamp in the last 60 seconds. Shows how busy the market is.">New per min <b>${nw}</b></span><span data-tip="Offers that disappeared in the last 60 seconds (cancelled or traded).">Removed per min <b>${cx.length}</b></span><span data-tip="Share of removed offers that lasted under 3 seconds. A high % usually means bots flashing fake offers (called spoofing), so big piles may not be real.">Gone in 3s <em class="n">(fast-cancel)</em> <b>${cx.length?Math.round(fast/cx.length*100):0}%</b></span><span data-tip="How many separate offers this page is keeping track of since you opened it.">Offers tracked <b>${S.ord.size}</b></span>`;
   if(!S.paused)draw();}
 setInterval(tick,1000);
 // ---------- heatmap
-const LUT=(()=>{const st=[[0,8,10,25],[.15,20,40,130],[.4,0,170,200],[.65,250,220,40],[.85,255,100,30],[1,255,255,255]],o=[];
+const LUT=(()=>{const st=[[0,244,246,250],[.2,214,226,244],[.45,150,180,222],[.7,70,110,180],[1,25,45,95]],o=[];
  for(let i=0;i<256;i++){const v=i/255;let k=1;while(st[k][0]<v)k++;const a=st[k-1],b=st[k],f=(v-a[0])/(b[0]-a[0]);
  o.push(`rgb(${a[1]+(b[1]-a[1])*f|0},${a[2]+(b[2]-a[2])*f|0},${a[3]+(b[3]-a[3])*f|0})`)}return o})();
 const cv=$('c'),ov=$('o'),cx=cv.getContext('2d'),ox=ov.getContext('2d');
@@ -209,7 +209,7 @@ function draw(){
   const W=S.W,H=S.H,n=S.cols.length;if(!W||!n)return;
   const PW=W-64,PH=H-20,R=+$('rng').value,g=+$('gam').value,mid=S.mid,lo=mid*(1-R),hi=mid*(1+R),rows=Math.max(20,PH/3|0),cw=PW/MAXC;
   S.view={PW,PH,lo,hi,rows,cw};
-  cx.fillStyle='#05070c';cx.fillRect(0,0,W,H);
+  cx.fillStyle='#fbfcfe';cx.fillRect(0,0,W,H);
   S.cache=S.cols.map(c=>{const r=new Float32Array(rows);const d=c.d;
     for(let i=0;i<d.length;i+=2){const p=d[i];if(p<lo||p>=hi)continue;r[(p-lo)/(hi-lo)*rows|0]+=p*d[i+1]}return r});
   const vals=[];for(const r of S.cache)for(let i=0;i<rows;i++)if(r[i]>0)vals.push(r[i]);
@@ -219,16 +219,16 @@ function draw(){
     for(let i=0;i<rows;i++){const v=r[i];if(v<=0)continue;const k=Math.min(1,Math.pow(v/mx,g));if(k<.03)continue;
       cx.fillStyle=LUT[k*255|0];cx.fillRect(x,PH-(i+1)*rh,cw+.6,rh+.6)}});
   const Y=p=>PH-(p-lo)/(hi-lo)*PH,X=t=>PW-(Date.now()-t)/1000*cw;
-  cx.strokeStyle='rgba(255,255,255,.85)';cx.lineWidth=1.3;cx.beginPath();
+  cx.strokeStyle='#1f2a44';cx.lineWidth=1.2;cx.beginPath();
   S.cols.forEach((c,i)=>{const x=PW-(n-i)*cw+cw/2;i?cx.lineTo(x,Y(c.mid)):cx.moveTo(x,Y(c.mid))});cx.stroke();
   for(const t of S.tr){const x=X(t.t),y=Y(t.p);if(x<0||y<0||y>PH)continue;
-    cx.fillStyle=t.s==='buy'?'rgba(38,208,124,.75)':'rgba(255,77,94,.75)';cx.strokeStyle='#000';cx.lineWidth=.5;
-    cx.beginPath();cx.arc(x,y,Math.min(12,2+Math.sqrt(t.p*t.q/400)),0,7);cx.fill();cx.stroke()}
-  cx.fillStyle='#0b0e14';cx.fillRect(PW,0,64,H);cx.fillRect(0,PH,W,20);cx.fillStyle='#9aa6bf';cx.font='11px ui-monospace,monospace';
-  for(let i=0;i<=6;i++){const p=lo+(hi-lo)*i/6;cx.fillText(fp(p),PW+4,Y(p)+4)}
+    cx.fillStyle=t.s==='buy'?'rgba(47,143,107,.6)':'rgba(196,87,94,.6)';cx.strokeStyle='#fff';cx.lineWidth=1;
+    cx.beginPath();cx.arc(x,y,Math.min(8,2+Math.sqrt(t.p*t.q/900)),0,7);cx.fill();cx.stroke()}
+  cx.fillStyle='#f6f7f9';cx.fillRect(PW,0,64,H);cx.fillRect(0,PH,W,20);cx.fillStyle='#6b7487';cx.font='11px ui-monospace,monospace';
+  for(let i=0;i<=6;i++){const p=lo+(hi-lo)*i/6;cx.fillText(fp(p),PW+4,Y(p)+4);cx.strokeStyle='rgba(0,0,0,.06)';cx.lineWidth=1;cx.beginPath();cx.moveTo(0,Y(p));cx.lineTo(PW,Y(p));cx.stroke()}
   for(let m=0;m*60<MAXC;m+=3){const x=PW-m*60*cw;if(x>20)cx.fillText(m?'-'+m+'m':'now',x-12,H-6)}
-  cx.fillStyle='#fff';cx.fillRect(PW,Y(mid)-8,64,16);cx.fillStyle='#000';cx.fillText(fp(mid),PW+4,Y(mid)+4);
-  cx.fillStyle='rgba(255,255,255,.55)';cx.fillText('↑ higher price',8,14);cx.fillText('↓ lower price',8,PH-8);cx.fillText('older ←     → newest',PW-150,14);
+  cx.fillStyle='#1f2a44';cx.fillRect(PW,Y(mid)-8,64,16);cx.fillStyle='#fff';cx.fillText(fp(mid),PW+4,Y(mid)+4);
+  cx.fillStyle='rgba(60,70,90,.55)';cx.fillText('↑ higher price',8,14);cx.fillText('↓ lower price',8,PH-8);cx.fillText('older ←     → newest',PW-150,14);
   hover();}
 // ---------- hover on heatmap
 ov.onmousemove=e=>{const r=ov.getBoundingClientRect();S.mouse={x:e.clientX-r.left,y:e.clientY-r.top,cx:e.clientX,cy:e.clientY};hover()};
@@ -236,12 +236,12 @@ ov.onmouseleave=()=>{S.mouse=null;hover()};
 function hover(){
   ox.clearRect(0,0,S.W,S.H);const m=S.mouse,v=S.view;
   if(!m||!v||m.x>v.PW||m.y>v.PH){if(m)tip.style.display='none';return}
-  ox.strokeStyle='rgba(255,255,255,.5)';ox.setLineDash([4,4]);ox.beginPath();ox.moveTo(m.x,0);ox.lineTo(m.x,v.PH);ox.moveTo(0,m.y);ox.lineTo(v.PW,m.y);ox.stroke();
+  ox.strokeStyle='rgba(30,40,60,.45)';ox.setLineDash([4,4]);ox.beginPath();ox.moveTo(m.x,0);ox.lineTo(m.x,v.PH);ox.moveTo(0,m.y);ox.lineTo(v.PW,m.y);ox.stroke();
   const n=S.cols.length,ci=n-Math.ceil((v.PW-m.x)/v.cw),ri=Math.min(v.rows-1,(v.PH-m.y)/v.PH*v.rows|0);
   const price=v.lo+(v.hi-v.lo)*(v.PH-m.y)/v.PH,rh=(v.hi-v.lo)/v.rows;
   let txt=`Price at your mouse: $${fp(price)}`;
   if(ci>=0&&ci<n){const val=S.cache[ci]?S.cache[ci][ri]:0,age=Math.round((Date.now()-S.cols[ci].t)/1000);
-    const big=val/S.mx>.7,buy=price<S.cols[ci].mid;txt+=`\n${new Date(S.cols[ci].t).toLocaleTimeString()} (${age}s ago)\nResting liquidity (orders waiting) at this price: about $${fm(val)}\n${val<=0?'Nothing waiting here.':big?(buy?'🔥 Big buyer wall: a possible floor.':'🔥 Big seller wall: a possible ceiling.'):(buy?'Some buyers waiting here.':'Some sellers waiting here.')}`;}
+    const big=val/S.mx>.7,buy=price<S.cols[ci].mid;txt+=`\n${new Date(S.cols[ci].t).toLocaleTimeString()} (${age}s ago)\nMoney waiting at this price: about $${fm(val)}\n${val<=0?'Nothing waiting here.':big?(buy?'🔥 Big buyer wall: a possible floor.':'🔥 Big seller wall: a possible ceiling.'):(buy?'Some buyers waiting here.':'Some sellers waiting here.')}`;}
   tip.style.whiteSpace='pre-line';tip.textContent=txt;tip.style.display='block';
   tip.style.left=Math.min(m.cx+14,innerWidth-300)+'px';tip.style.top=Math.min(m.cy+16,innerHeight-110)+'px';}
 // help legend inside heatmap
