@@ -1,117 +1,114 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>XRP/USD Order Book Heatmap</title>
+<link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#f6f7f9;--p:#fff;--b:#e3e6ec;--t:#2b3240;--m:#6b7487;--g:#2f8f6b;--r:#c4575e;--a:#3d6fb6}
+:root{--bg:#121a24;--p:#1a2533;--b:#2a3a4d;--t:#e6edf5;--m:#8da0b8;--g:#21c577;--r:#f0504a;--a:#5aa9ff}
 *{box-sizing:border-box}html,body{height:100%;margin:0}
 body{background:var(--bg);color:var(--t);font:14px/1.45 system-ui,-apple-system,Segoe UI,sans-serif;display:flex;flex-direction:column;overflow:auto}
 header{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:8px 12px;border-bottom:1px solid var(--b)}
 h1{font-size:15px;margin:0 8px 0 0}
 .pill{padding:2px 9px;border-radius:99px;border:1px solid var(--b);color:var(--m);cursor:help}
-.pill.ok{color:var(--g);border-color:#a9d9c3}.pill.bad{color:var(--r);border-color:#e3b0b4}
+.pill.ok{color:var(--g);border-color:#1d6b49}.pill.bad{color:var(--r);border-color:#7a2d2b}
 .ctl{display:flex;align-items:center;gap:5px;color:var(--m)}
 select,input,button{background:var(--p);color:var(--t);border:1px solid var(--b);border-radius:6px;padding:3px 6px;font:inherit}
-button{cursor:pointer}input[type=range]{padding:0;width:80px}input[type=number]{width:80px}
-#stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;padding:8px 12px}
+button{cursor:pointer}input[type=range]{padding:0;width:80px}input[type=number]{width:80px}input[type=checkbox]{accent-color:var(--a)}
+.gg{color:var(--g)}.rr{color:var(--r)}
+em.n{color:var(--m);font-size:11px;font-style:normal;font-weight:400;text-transform:none;letter-spacing:0}
+#intro{margin:8px 12px 0;background:var(--p);border:1px solid var(--b);border-radius:8px;padding:6px 12px;max-height:44vh;overflow:auto}
+#intro summary{cursor:pointer;font-weight:600}
+#intro .g{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}
+#intro h4{margin:8px 0 4px;color:var(--a)}#intro p{margin:0 0 6px}#intro ul{margin:0 0 6px;padding-left:18px}
+.bar{height:12px;border-radius:6px;background:linear-gradient(90deg,#17222e,#103864,#1870a8,#d6c43a,#e85030,#ffece6)}
+.bl{display:flex;justify-content:space-between;color:var(--m);font-size:11px}
+#sum{margin:8px 12px 0;padding:8px 12px;background:#17304d;border:1px solid #2f5282;border-radius:8px;line-height:1.5}
+#stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;padding:8px 12px}
 .card{background:var(--p);border:1px solid var(--b);border-radius:8px;padding:6px 10px;cursor:help}
 .card small{color:var(--m);display:block}.card b{font-size:16px}
-main{flex:1;display:flex;gap:8px;padding:0 12px 8px;min-height:480px}
-#hm{flex:1;position:relative;background:#fbfcfe;border:1px solid var(--b);border-radius:8px;min-width:0}
-#hm canvas{position:absolute;inset:0;width:100%;height:100%}
-aside{width:310px;display:flex;flex-direction:column;gap:8px;min-height:0}
-.box{background:var(--p);border:1px solid var(--b);border-radius:8px;padding:6px 8px;overflow:hidden}
-.box h3{margin:0 0 4px;font-size:12px;color:var(--m);text-transform:uppercase;letter-spacing:.05em;cursor:help}
-#lad{font:12px ui-monospace,Menlo,monospace}
-.row{display:flex;justify-content:space-between;position:relative;padding:0 4px;height:17px;line-height:17px}
-.row i{position:absolute;right:0;top:1px;bottom:1px;opacity:.28;z-index:0}
-.row span{position:relative;z-index:1}
-.a{color:var(--r)}.bd{color:var(--g)}.a i{background:var(--r)}.bd i{background:var(--g)}
-.sp{text-align:center;color:var(--m);font-size:11px;padding:2px}
-#feedbox{flex:1;display:flex;flex-direction:column;min-height:120px}
-#feed{overflow:auto;flex:1;font:11.5px ui-monospace,Menlo,monospace}
-#feed div{padding:1px 0;border-bottom:1px solid #eceff4;white-space:nowrap}
-#l3s{display:grid;grid-template-columns:1fr 1fr;gap:2px 8px;color:var(--m);font-size:12px;margin-bottom:4px}
-#l3s b{color:var(--t)}
-#tip{position:fixed;z-index:9;background:#2b3240;color:#fff;border:1px solid #2b3240;border-radius:6px;padding:6px 9px;max-width:290px;pointer-events:none;display:none;box-shadow:0 4px 18px #0003}
-#tip{white-space:pre-line}
-.gg{color:var(--g)}.rr{color:var(--r)}
-em.n{color:var(--m);font-size:10.5px;font-style:normal;font-weight:400;text-transform:none;letter-spacing:0}
+main{display:flex;gap:8px;padding:0 12px 8px;min-height:640px}
 #hmw{flex:1;display:flex;flex-direction:column;min-width:0;gap:4px}
 .hmh{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center}
 .lg{display:flex;align-items:center;gap:5px;color:var(--m);font-size:11px;cursor:help}.lg .bar{display:block;width:110px}
 .hmh>span{color:var(--m);font-size:11px;cursor:help}
-#intro{margin:8px 12px 0;background:var(--p);border:1px solid var(--b);border-radius:8px;padding:6px 12px;max-height:42vh;overflow:auto}
-#intro summary{cursor:pointer;font-weight:600}
-#intro .g{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}
-#intro h4{margin:8px 0 4px;color:var(--a)}#intro p{margin:0 0 6px}#intro ul{margin:0 0 6px;padding-left:18px}
-.bar{height:12px;border-radius:6px;background:linear-gradient(90deg,#f4f6fa,#d6e2f4,#96b4de,#466eb4,#192d5f)}
-.bl{display:flex;justify-content:space-between;color:var(--m);font-size:11px}
-#sum{margin:8px 12px 0;padding:8px 12px;background:#eef3fb;border:1px solid #d5e0f2;color:var(--t);border-radius:8px;line-height:1.5}
-footer{padding:4px 12px 8px;color:var(--m);font-size:11px}
-@media(max-width:900px){main{flex-direction:column;overflow:auto}#hm{min-height:380px;flex:none}#hmw{flex:none}aside{width:auto}}
+#hm{flex:1;position:relative;background:#16212d;border:1px solid var(--b);border-radius:8px;min-width:0;min-height:600px}
+#hm canvas{position:absolute;inset:0;width:100%;height:100%}
+aside{width:320px;display:flex;flex-direction:column;gap:8px}
+.box{background:var(--p);border:1px solid var(--b);border-radius:8px;padding:6px 8px;overflow:hidden}
+.box h3{margin:0 0 4px;font-size:12px;color:var(--m);text-transform:uppercase;letter-spacing:.05em;cursor:help}
+#lad,#ts{font:12px ui-monospace,Menlo,monospace}
+.row{display:flex;justify-content:space-between;position:relative;padding:0 4px;height:17px;line-height:17px}
+.row i{position:absolute;right:0;top:1px;bottom:1px;opacity:.3;z-index:0}.row span{position:relative;z-index:1}
+.a{color:var(--r)}.bd{color:var(--g)}.a i{background:var(--r)}.bd i{background:var(--g)}
+.sp{text-align:center;color:var(--m);font-size:11px;padding:2px}
+#feed{overflow:auto;max-height:240px;font:11.5px ui-monospace,Menlo,monospace}
+#feed div{padding:1px 0;border-bottom:1px solid #243244;white-space:nowrap}
+#l3s{display:grid;grid-template-columns:1fr 1fr;gap:2px 8px;color:var(--m);font-size:12px;margin-bottom:4px}#l3s b{color:var(--t)}
+#tip{position:fixed;z-index:9;background:#0b1118;color:#fff;border:1px solid #3a516d;border-radius:6px;padding:6px 9px;max-width:300px;pointer-events:none;display:none;box-shadow:0 4px 18px #000a;white-space:pre-line}
+footer{padding:4px 12px 10px;color:var(--m);font-size:11px}
+@media(max-width:900px){main{flex-direction:column}#hm{flex:none;min-height:520px}#hmw{flex:none}aside{width:auto}}
 </style></head><body>
 <header>
 <h1>XRP/USD · Order Book Heatmap</h1>
 <span class="pill" id="p1" data-tip="Level 2 feed (total size waiting at each price) plus trades, from Kraken (a crypto exchange). Green = working. Red = trying to reconnect.">Kraken L2 …</span>
 <span class="pill" id="p2" data-tip="Level 3 feed (every individual order placed, changed or cancelled) from Bitstamp (another exchange). Green = working. Red = trying to reconnect.">Bitstamp L3 …</span>
-<label class="ctl" data-tip="How much price range the chart shows above and below today's price. ±1% means you see prices from 1% below to 1% above. Pick a smaller number to zoom in.">Zoom <em class="n">(price range)</em>
+<label class="ctl" data-tip="How much price range the chart shows above and below today's price. ±1% means prices from 1% below to 1% above. Pick smaller to zoom in.">Zoom <em class="n">(price range)</em>
 <select id="rng"><option value=.005>±0.5%</option><option value=.01 selected>±1%</option><option value=.02>±2%</option><option value=.05>±5%</option></select></label>
-<label class="ctl" data-tip="Makes the colors brighter or dimmer. Slide left to also see small orders. Slide right to see only the very biggest ones.">Brightness <em class="n">(contrast)</em>
+<label class="ctl" data-tip="Makes colors brighter or dimmer. Slide left to also see small offers. Slide right to see only the biggest piles.">Brightness <em class="n">(contrast)</em>
 <input id="gam" type="range" min=".25" max="1" step=".05" value=".6"></label>
-<label class="ctl" data-tip="Only single orders worth at least this many US dollars are listed in the live orders box on the right. Very big orders are nicknamed whales. Lower the number to see more orders. For you: whales can move price far more than a small account ever will, so watching them helps you avoid trading against them.">Show orders over $ <em class="n">(“whales”)</em>
+<label class="ctl" data-tip="Only single offers worth at least this many US dollars are listed in the live offers box. Very big ones are nicknamed whales. For you: whales can move price far more than a small account, so watching them helps you avoid trading against them.">Show orders over $ <em class="n">(“whales”)</em>
 <input id="whale" type="number" value="25000" step="5000" min="0"></label>
+<label class="ctl" data-tip="Shows or hides the white-text notes drawn on the chart. They point out big piles, offers that got pulled, and big rushed trades, in plain words."><input type="checkbox" id="notes" checked> Notes on chart</label>
 <button id="pause" data-tip="Freeze the picture so you can study it. Data keeps recording in the background; press Resume to catch up.">Pause</button>
 </header>
 <details id="intro" open><summary>👋 Start here: how to read this in 1 minute (click to hide or show)</summary>
 <div class="g">
-<div><h4>The idea</h4><p>People who want to buy or sell XRP leave offers on an exchange and wait. Like “I’ll buy at $2.00” or “I’ll sell at $2.10”. All those waiting offers together are called the <b>order book</b>. This page draws them as a picture.</p></div>
-<div><h4>The picture</h4><ul><li><b>Sideways</b> = time. The right edge is now.</li><li><b>Up and down</b> = price. Higher on screen = higher price.</li><li><b>Darker blue</b> = more money waiting at that price.</li><li><b>Dark line</b> = the real price.</li><li><b>Small circles</b> = real trades. Green = someone bought. Red = someone sold.</li></ul><div class="bar"></div><div class="bl"><span>almost nothing</span><span>a lot waiting</span></div></div>
-<div><h4>Why it helps</h4><ul><li>A dark patch <b>under</b> the price = lots of buyers waiting. Price often slows or bounces there. Called a <b>floor</b>.</li><li>A dark patch <b>over</b> the price = lots of sellers waiting. Price often slows there. Called a <b>ceiling</b>.</li><li>Offers can be cancelled any second. Treat them as clues, not promises.</li><li>Hover your mouse over <b>anything</b> to get a simple explanation.</li></ul></div>
+<div><h4>The idea</h4><p>People who want to buy or sell XRP leave offers on an exchange and wait. Like “I’ll buy at $2.00” or “I’ll sell at $2.10”. All the waiting offers together are the <b>order book</b>. This page draws them as a picture.</p></div>
+<div><h4>The main picture</h4><ul><li><b>Sideways</b> = time. The right edge is now.</li><li><b>Up and down</b> = price.</li><li><b>Color</b> = money waiting at that price. Dark blue = a little, yellow = a lot, red/white = a huge pile.</li><li><b>Thin line</b> = the real price.</li><li><b>Bubbles</b> = real trades by someone in a hurry. Teal = a buyer, pink = a seller. Bigger = more money.</li></ul><div class="bar"></div><div class="bl"><span>almost nothing</span><span>a huge pile</span></div></div>
+<div><h4>The side panels</h4><ul><li><b>COB</b> = offers waiting <i>right now</i> (green = buy, red = sell).</li><li><b>SVP</b> = what actually traded at each price since you opened the page. Long bars = a busy price.</li><li><b>SVP Delta</b> = buying minus selling at each price. Right/green = buyers won there, left/red = sellers.</li><li><b>Bottom bars</b> = rushed buying (green) and selling (red) each second. <b>CVD line</b> = running total of buying minus selling.</li></ul></div>
+<div><h4>Why it helps</h4><ul><li>A bright patch <b>under</b> the price = lots of buyers waiting. Price often slows or bounces. Called a <b>floor</b>.</li><li>A bright patch <b>over</b> the price = lots of sellers waiting. Called a <b>ceiling</b>.</li><li>Offers can be cancelled any second. Treat them as clues, not promises.</li><li><b>White notes on the chart</b> point out the important things. Turn them off with “Notes on chart”.</li><li>Hover your mouse over <b>anything</b> for a simple explanation.</li></ul></div>
 <div><h4>If you have a small account</h4><ul>
-<li><b>Use limit orders.</b> You pick the price. A market order takes whatever price is there, which can be worse on a thin market (that loss is called slippage).</li>
+<li><b>Use limit orders.</b> You pick the price. A market order takes whatever is there, which can be worse on a thin market (that loss is called slippage).</li>
 <li><b>Small is an advantage.</b> Your amount is tiny next to the big piles, so you can get in and out without moving the price.</li>
 <li><b>Few offers = fast jumps.</b> Use a smaller amount and a stop-loss.</li>
 <li><b>Be careful with piles that vanish.</b> If “Gone in 3s” is high, many big offers are probably fake.</li>
 <li><b>Fees matter more.</b> Add your exchange fee and the price gap, and compare with what you hope to earn.</li>
 <li><b>Your exchange may differ a little.</b> This shows Kraken and Bitstamp. Check your own price.</li>
 <li>No chart can predict the future. Only risk money you can afford to lose.</li></ul></div>
-<div><h4>Mini dictionary</h4><p><b>XRP</b>: a cryptocurrency. <b>USD</b>: US dollars. <b>Buy offer (bid)</b>: an offer to buy at a set price. <b>Sell offer (ask)</b>: an offer to sell at a set price. <b>Price gap (spread)</b>: the gap between the best buy and best sell price. <b>Wall</b>: a big pile of offers at one price. <b>Level 2</b>: all offers added up at each price. <b>Level 3</b>: every single offer separately. <b>Whale</b>: someone moving a lot of money. <b>Liquidity</b>: how easy it is to trade without moving the price. <b>Imbalance</b>: how lopsided buyers vs sellers are. <b>Basis point</b>: 0.01%. <b>Market order</b>: buy or sell right now at whatever price is available. <b>Limit order</b>: you choose the price and wait. <b>Net flow (CVD)</b>: rushed buying minus rushed selling. <b>Spoofing</b>: placing big fake offers to fool others, then cancelling them.</p></div>
+<div><h4>Mini dictionary</h4><p><b>XRP</b>: a cryptocurrency. <b>USD</b>: US dollars. <b>Buy offer (bid)</b>: an offer to buy at a set price. <b>Sell offer (ask)</b>: an offer to sell at a set price. <b>Price gap (spread)</b>: gap between best buy and best sell price. <b>Wall</b>: a big pile of offers at one price. <b>Level 2</b>: all offers added up at each price. <b>Level 3</b>: every single offer separately. <b>Whale</b>: someone moving a lot of money. <b>Liquidity</b>: how easy it is to trade without moving the price. <b>Imbalance</b>: how lopsided buyers vs sellers are. <b>Basis point</b>: 0.01%. <b>Aggressive trade</b>: buying or selling right now at whatever price is there. <b>Market order</b>: same thing. <b>Limit order</b>: you choose the price and wait. <b>CVD / net flow</b>: rushed buying minus rushed selling. <b>Spoofing</b>: placing big fake offers to fool others, then cancelling them. <b>COB / SVP</b>: current order book / session volume profile.</p></div>
 </div></details>
 <div id="sum">Connecting to live data…</div>
 <section id="stats"></section>
 <main>
 <div id="hmw"><div class="hmh">
-<b data-tip="Each column is a snapshot of all waiting offers, taken once per second. Together they show how piles of offers appear, move and disappear over about 15 minutes.">Picture of waiting offers over time <em class="n">(Level 2 liquidity heatmap)</em></b> <em class="n"><b>For you:</b> dark patches are spots where price may slow down or bounce. Good places to think about getting in or out, and a warning not to chase price into a big pile.</em></b>
-<span class="lg" data-tip="Color key. Pale = almost nothing waiting at that price. Darker blue = more money waiting. Darkest = the biggest piles."><span>almost nothing</span><i class="bar"></i><span>a lot waiting</span></span>
-<span data-tip="Circles are real trades (market orders) from Kraken. Green = a buyer took the price up, red = a seller hit the price down. Bigger circle = more money."><span class="gg">●</span> green = someone bought · <span class="rr">●</span> red = someone sold · dark line = price</span></div>
+<b data-tip="Each column is a snapshot of all waiting offers, taken once per second. Together they show how piles of offers appear, move and disappear over about 15 minutes.">Picture of waiting offers over time <em class="n">(Level 2 liquidity heatmap)</em></b>
+<span class="lg" data-tip="Color key. Dark blue = almost nothing waiting at that price. Teal/yellow = a lot. Red/white = the biggest piles."><span>almost nothing</span><i class="bar"></i><span>huge pile</span></span>
+<span data-tip="Bubbles are real trades from people in a hurry (market orders) on Kraken. Teal = a buyer pushed price up. Pink = a seller pushed price down. Bigger bubble = more money.">○ teal = someone bought · ○ pink = someone sold · line = price</span></div>
 <div id="hm"><canvas id="c"></canvas><canvas id="o"></canvas></div></div>
 <aside>
-<div class="box"><h3 data-tip="Every price where people are waiting to trade, from Kraken. Red rows on top = people wanting to SELL (at higher prices). Green rows below = people wanting to BUY (at lower prices). Longer bar = more money waiting at that price. For you: if the rows nearest the middle are thin, a market order can slip to a worse price, so use a limit order.">Waiting offers list <em class="n">(order book, Level 2)</em></h3><div id="lad"></div></div>
-<div class="box" id="feedbox"><h3 data-tip="Level 3 = individual orders, one by one (Level 2 only shows totals per price). Source: Bitstamp, the only major exchange giving this free with no login. NEW = order placed. CANCEL = removed (cancelled OR filled; the feed cannot tell which). CHG = size changed. Only orders above your Whale threshold are listed. For you: many big orders appearing and vanishing within seconds are usually bots, so do not base a trade on them.">Live offers, one by one <em class="n">(Level 3, from Bitstamp)</em></h3><div style="color:var(--m);font-size:11px;margin-bottom:3px">NEW = someone placed an offer · CANCEL = offer removed (cancelled or traded) · CHG = offer changed size · 🐋 = very big</div>
+<div class="box"><h3 data-tip="Every price where people are waiting to trade, from Kraken. Red rows on top = people wanting to SELL (higher prices). Green rows below = people wanting to BUY (lower prices). Longer bar = more money waiting. For you: if the rows nearest the middle are thin, a market order can slip to a worse price, so use a limit order.">Waiting offers list <em class="n">(order book, Level 2)</em></h3><div id="lad"></div></div>
+<div class="box"><h3 data-tip="Time and Sales: the latest real trades on Kraken, newest first. Green = a buyer in a hurry. Red = a seller in a hurry.">Trades as they happen <em class="n">(Time &amp; Sales)</em></h3><div id="ts"></div></div>
+<div class="box"><h3 data-tip="Level 3 = individual offers, one by one (Level 2 only shows totals per price). Source: Bitstamp, the only major exchange giving this free with no login. NEW = offer placed. CANCEL = removed (cancelled OR traded; the feed cannot tell which). CHG = size changed. Only offers above your whale amount are listed. For you: many big offers appearing and vanishing within seconds are usually bots, so do not base a trade on them.">Live offers, one by one <em class="n">(Level 3, from Bitstamp)</em></h3>
+<div style="color:var(--m);font-size:11px;margin-bottom:3px">NEW = someone placed an offer · CANCEL = removed (cancelled or traded) · CHG = changed size · 🐋 = very big</div>
 <div id="l3s"></div><div id="feed"></div></div>
 </aside></main>
 <footer>Data: Kraken (Level 2 + trades) and Bitstamp (Level 3) public WebSockets, free, no keys. Shows only these two venues, not the whole XRP market. Educational tool, not financial advice. Never trade money you cannot afford to lose.</footer>
 <div id="tip"></div>
 <script>
 const $=id=>document.getElementById(id),MAXC=900,DEPTH=500;
-const S={b:new Map(),a:new Map(),cols:[],tr:[],ord:new Map(),ev:[],mid:0,paused:false,cache:[],mouse:null,view:null};
-const fm=n=>n>=1e6?(n/1e6).toFixed(2)+'M':n>=1e3?(n/1e3).toFixed(1)+'K':n.toFixed(0);
-const fp=p=>p.toFixed(4);
-// ---------- tooltips
+const S={b:new Map(),a:new Map(),cols:[],tr:[],ord:new Map(),ev:[],mid:0,paused:false,cache:[],mouse:null,v:null,vp:new Map(),cvd:0,last:Date.now(),pan:null,mx:1};
+const fm=n=>n>=1e6?(n/1e6).toFixed(2)+'M':n>=1e3?(n/1e3).toFixed(1)+'K':n.toFixed(0),fp=p=>p.toFixed(4);
 const tip=$('tip');
-document.addEventListener('mousemove',e=>{
-  const el=e.target.closest&&e.target.closest('[data-tip]');
-  if(e.target===ov)return;if(!el){tip.style.display='none';return}
-  tip.textContent=el.dataset.tip;tip.style.display='block';
-  tip.style.left=Math.min(e.clientX+14,innerWidth-300)+'px';tip.style.top=Math.min(e.clientY+16,innerHeight-90)+'px';});
-// ---------- stat cards
+function showTip(t,x,y){tip.textContent=t;tip.style.display='block';tip.style.left=Math.min(x+14,innerWidth-310)+'px';tip.style.top=Math.min(y+16,innerHeight-130)+'px'}
+document.addEventListener('mousemove',e=>{if(e.target===$('o'))return;const el=e.target.closest&&e.target.closest('[data-tip]');
+  if(!el){tip.style.display='none';return}showTip(el.dataset.tip,e.clientX,e.clientY)});
+// ---- cards
 const CARDS=[['mid','Price right now','(mid price)','The price XRP is at right now. It sits halfway between the highest price a buyer offers and the lowest price a seller asks.'],
-['spr','Price gap','(spread)','The small gap between what buyers offer and what sellers ask. A small gap is good for you: you lose less when you buy and then sell. (Technical: measured here as a % of the price.)'],
-['imb','Buyers vs sellers','(imbalance)','Out of all the money waiting close to today’s price, this is the share waiting to BUY. Over 50% = more people want to buy. Under 50% = more want to sell. Just a hint, not a promise.'],
+['spr','Price gap','(spread)','The small gap between what buyers offer and what sellers ask. A small gap is good for you: you lose less when you buy and then sell.'],
+['imb','Buyers vs sellers','(imbalance)','Out of all the money waiting close to today’s price (within 1%), the share waiting to BUY. Over 50% = more people want to buy. Under 50% = more want to sell. Just a hint.'],
 ['bd','Money waiting to buy','(bid depth)','Total dollars of buy offers waiting just under the price (within 1%). More = a softer landing if price drops.'],
 ['ad','Money waiting to sell','(ask depth)','Total dollars of sell offers waiting just over the price (within 1%). More = price may have a harder time going up.'],
 ['bw','Strongest floor','(buy wall)','The one price, within 2% under today’s price, where the most buy offers are piled up. Price often slows or bounces there. The buyer can cancel at any time.'],
-['aw','Strongest ceiling','(sell wall)','The one price, within 2% over today’s price, where the most sell offers are piled up. Price often slows down there. The seller can cancel at any time.'],
+['aw','Strongest ceiling','(sell wall)','The one price, within 2% over today’s price, where the most sell offers are piled up. Price often slows there. The seller can cancel at any time.'],
 ['cvd','Who is rushing (5 min)','(net flow, CVD)','Over the last 5 minutes: dollars from people who bought right away, minus dollars from people who sold right away. Plus (green) = buyers more in a hurry. Minus (red) = sellers more in a hurry.']];
 const YOU={mid:'This is about the price you will get. Your own exchange can be slightly different, so check it before you confirm.',
 spr:'A bigger gap is a hidden cost: you buy at the higher price and sell at the lower one. Use limit orders (you pick the price) and prefer calm moments.',
@@ -121,58 +118,43 @@ ad:'A lot of money over the price means rises may stall. Very little means price
 bw:'Some traders set a buy offer just above a big floor and a stop-loss just under it. Floors can vanish, so never rely on one alone.',
 aw:'Some traders take profit just under a big ceiling. If price pushes through it with strong buying, that can show strength.',
 cvd:'Shows who is rushing right now. Green while price rises = real buying. Price rising while this is red can be a weak move, so be careful.'};
-$('stats').innerHTML=CARDS.map(c=>`<div class="card" data-tip="${c[3]}
-
-💡 For you: ${YOU[c[0]]}"><small>${c[1]} <em class="n">${c[2]}</em></small><b id="s_${c[0]}">–</b></div>`).join('');
-const sv=(k,v,cls)=>{const e=$('s_'+k);e.textContent=v;e.style.color=cls||''};
-// ---------- sockets
-function conn(url,sub,fn,pill,name){
-  const p=$(pill);let ws;
+$('stats').innerHTML=CARDS.map(c=>`<div class="card" data-tip="${c[3]}\n\n💡 For you: ${YOU[c[0]]}"><small>${c[1]} <em class="n">${c[2]}</em></small><b id="s_${c[0]}">–</b></div>`).join('');
+const sv=(k,v,c)=>{const e=$('s_'+k);e.textContent=v;e.style.color=c||''};
+// ---- sockets
+function conn(url,subs,fn,pill,name){const p=$(pill);let ws;
   (function go(){ws=new WebSocket(url);
-    ws.onopen=()=>{p.textContent=name+' live';p.className='pill ok';ws.send(JSON.stringify(sub))};
+    ws.onopen=()=>{p.textContent=name+' live';p.className='pill ok';subs.forEach(x=>ws.send(JSON.stringify(x)))};
     ws.onmessage=e=>{try{fn(JSON.parse(e.data))}catch(x){}};
     ws.onclose=()=>{p.textContent=name+' reconnecting…';p.className='pill bad';setTimeout(go,2000)};
-    ws.onerror=()=>ws.close()})();}
-function sub2(sym){return {method:'subscribe',params:{channel:'book',symbol:[sym],depth:DEPTH}}}
-conn('wss://ws.kraken.com/v2',sub2('XRP/USD'),m=>{
-  if(m.channel==='book'&&m.data){const d=m.data[0];
-    if(m.type==='snapshot'){S.b.clear();S.a.clear()}
+    ws.onerror=()=>ws.close()})()}
+function addTrade(p,q,s){S.tr.push({t:Date.now(),p,q,s});const k=p.toFixed(4);let e=S.vp.get(k);if(!e){e={p,b:0,s:0};S.vp.set(k,e)}s==='buy'?e.b+=q:e.s+=q;if(S.tr.length>6000)S.tr.shift()}
+conn('wss://ws.kraken.com/v2',[{method:'subscribe',params:{channel:'book',symbol:['XRP/USD'],depth:DEPTH}},{method:'subscribe',params:{channel:'trade',symbol:['XRP/USD']}}],m=>{
+  if(m.channel==='book'&&m.data){const d=m.data[0];if(m.type==='snapshot'){S.b.clear();S.a.clear()}
     for(const l of d.bids)l.qty===0?S.b.delete(l.price):S.b.set(l.price,l.qty);
     for(const l of d.asks)l.qty===0?S.a.delete(l.price):S.a.set(l.price,l.qty);S.ready=1}
-  else if(m.channel==='trade'&&m.type==='update')for(const t of m.data)S.tr.push({t:Date.parse(t.timestamp),p:t.price,q:t.qty,s:t.side});
-},'p1','Kraken L2');
-// second Kraken subscription for trades
-(function(){const ws=new WebSocket('wss://ws.kraken.com/v2');
- ws.onopen=()=>ws.send(JSON.stringify({method:'subscribe',params:{channel:'trade',symbol:['XRP/USD']}}));
- ws.onmessage=e=>{try{const m=JSON.parse(e.data);if(m.channel==='trade'&&m.type==='update')for(const t of m.data)S.tr.push({t:Date.parse(t.timestamp),p:t.price,q:t.qty,s:t.side})}catch(x){}};
- ws.onclose=()=>setTimeout(arguments.callee,3000)})();
-// Level 3 (Bitstamp live_orders)
-conn('wss://ws.bitstamp.net',{event:'bts:subscribe',data:{channel:'live_orders_xrpusd'}},m=>{
+  else if(m.channel==='trade'&&m.type==='update')m.data.forEach(t=>addTrade(t.price,t.qty,t.side))},'p1','Kraken L2');
+conn('wss://ws.bitstamp.net',[{event:'bts:subscribe',data:{channel:'live_orders_xrpusd'}}],m=>{
   if(!m.event||m.event.indexOf('order_')!==0)return;
-  const d=m.data,id=d.id_str||String(d.id),now=Date.now(),usd=d.amount*d.price,side=d.order_type==0?'B':'S';
-  let type='NEW',life=null;
+  const d=m.data,id=d.id_str||String(d.id),now=Date.now(),usd=d.amount*d.price,side=d.order_type==0?'B':'S';let type='NEW',life=null;
   if(m.event==='order_created')S.ord.set(id,{t:now,side});
-  else if(m.event==='order_deleted'){type='CANCEL';const o=S.ord.get(id);if(o){life=now-o.t;S.ord.delete(id)}}
-  else type='CHG';
+  else if(m.event==='order_deleted'){type='CANCEL';const o=S.ord.get(id);if(o){life=now-o.t;S.ord.delete(id)}}else type='CHG';
   S.ev.push({t:now,type,fast:life!==null&&life<3000});
-  if(S.ord.size>20000){S.ord.delete(S.ord.keys().next().value)}
-  if(usd>=+$('whale').value)addFeed(type,side,d.price,d.amount,usd,life);
-},'p2','Bitstamp L3');
+  if(S.ord.size>20000)S.ord.delete(S.ord.keys().next().value);
+  if(usd>=+$('whale').value)addFeed(type,side,d.price,d.amount,usd,life)},'p2','Bitstamp L3');
 function addFeed(type,side,p,q,usd,life){
-  const c={NEW:'#4da3ff',CANCEL:'#ffb454',CHG:'#7f8aa3'}[type],d=document.createElement('div');
-  d.dataset.tip=({NEW:'Someone just placed a new order. It is now waiting in the order book.',CANCEL:'This order disappeared: the person cancelled it, or it was matched and traded. The feed cannot tell which. '+(life!==null?'It lasted only '+(life/1000).toFixed(1)+' seconds. Big orders that vanish within seconds are often bots flashing or spoofing (placing fake walls to fool others), so do not treat them as real support or resistance.':''),CHG:'The person changed the size of this waiting order.'})[type];
+  const c={NEW:'#5aa9ff',CANCEL:'#ffb454',CHG:'#8da0b8'}[type],d=document.createElement('div');
+  d.dataset.tip=({NEW:'Someone just placed a new offer. It is now waiting in the order book.',CANCEL:'This offer disappeared: the person cancelled it, or it was matched and traded. The feed cannot tell which. '+(life!==null?'It lasted only '+(life/1000).toFixed(1)+' seconds. Big offers that vanish within seconds are often bots flashing or spoofing (placing fake walls to fool others), so do not treat them as real support or resistance.':''),CHG:'The person changed the size of this waiting offer.'})[type];
   d.innerHTML=`<span style="color:${c}">${type.padEnd(6,'\u00a0')}</span><span class="${side=='B'?'bd':'a'}">${side=='B'?'BUY ':'SELL'}</span> ${fp(p)} · ${fm(q)} XRP · <b>$${fm(usd)}</b>${usd>=4*+$('whale').value?' 🐋':''}${life!==null?' · '+(life/1000).toFixed(1)+'s':''}`;
-  const f=$('feed');f.prepend(d);while(f.children.length>80)f.lastChild.remove();}
-// ---------- 1-second snapshot
+  const f=$('feed');f.prepend(d);while(f.children.length>80)f.lastChild.remove()}
+// ---- 1-second snapshot
 function tick(){
   if(!S.ready||!S.b.size||!S.a.size)return;
-  const B=[...S.b].sort((x,y)=>y[0]-x[0]).slice(0,DEPTH),A=[...S.a].sort((x,y)=>x[0]-y[0]).slice(0,DEPTH);
-  S.b=new Map(B);S.a=new Map(A);
-  const bb=B[0][0],ba=A[0][0],mid=(bb+ba)/2;S.mid=mid;
+  const B=[...S.b].sort((x,y)=>y[0]-x[0]).slice(0,DEPTH),A=[...S.a].sort((x,y)=>x[0]-y[0]).slice(0,DEPTH);S.b=new Map(B);S.a=new Map(A);
+  const bb=B[0][0],ba=A[0][0],mid=(bb+ba)/2,now=Date.now();S.mid=mid;S.bb=bb;S.ba=ba;
+  let bv=0,sv2=0;for(const t of S.tr)if(t.t>S.last)t.s==='buy'?bv+=t.q:sv2+=t.q;S.last=now;S.cvd+=bv-sv2;
   const arr=[];for(const [p,q] of B)if(p>mid*.95)arr.push(p,q);for(const [p,q] of A)if(p<mid*1.05)arr.push(p,q);
-  S.cols.push({t:Date.now(),mid,d:new Float32Array(arr)});if(S.cols.length>MAXC)S.cols.shift();
-  const now=Date.now();S.tr=S.tr.filter(t=>now-t.t<MAXC*1000);S.ev=S.ev.filter(e=>now-e.t<60000);
-  // stats
+  S.cols.push({t:now,mid,d:new Float32Array(arr),bv,sv:sv2,cvd:S.cvd});if(S.cols.length>MAXC)S.cols.shift();
+  S.ev=S.ev.filter(e=>now-e.t<60000);S.tr=S.tr.filter(t=>now-t.t<MAXC*1000);
   const sum=(L,f)=>L.filter(f).reduce((s,[p,q])=>s+p*q,0),bd=sum(B,l=>l[0]>=mid*.99),ad=sum(A,l=>l[0]<=mid*1.01);
   const wall=(L,lim)=>L.filter(l=>lim(l[0])).reduce((m,l)=>l[0]*l[1]>m[1]?[l[0],l[0]*l[1]]:m,[0,0]);
   const bw=wall(B,p=>p>=mid*.98),aw=wall(A,p=>p<=mid*1.02),imb=bd/(bd+ad)*100;
@@ -186,64 +168,111 @@ function tick(){
   const spb=(ba-bb)/mid*1e4,you=(imb>58?'Dips may be softer, but it is usually calmer to let the price come to your offer than to chase it.':imb<42?'Rises may stall. Being patient or using a smaller amount is often safer.':'Nothing stands out, so there is no need to rush. Waiting is okay.')+(spb>10?' The price gap is wide right now, so use limit orders (you choose the price).':'');
   const flow=Math.abs(net)<2000?'In the last 5 minutes, buying and selling were about even.':net>0?'In the last 5 minutes, more people rushed to buy than rushed to sell.':'In the last 5 minutes, more people rushed to sell than rushed to buy.';
   $('sum').innerHTML=`<b>In simple words, right now:</b> XRP is about <b>$${fp(mid)}</b>. ${side} ${flow}<br>Strongest floor (pile of buyers) is near <b>$${bw[1]?fp(bw[0]):'–'}</b>. Strongest ceiling (pile of sellers) is near <b>$${aw[1]?fp(aw[0]):'–'}</b>.<br>💡 <b>For you:</b> ${you}<br><i>This is a description of what is happening. It is not a prediction and not advice.</i>`;
-  // ladder
   const N=9,as=A.slice(0,N).reverse(),bs=B.slice(0,N),mx=Math.max(...as.concat(bs).map(l=>l[1]));
-  const row=(l,c)=>`<div class="row ${c}" data-tip="${c=='a'?'Sell':'Buy'} orders at ${fp(l[0])}: ${fm(l[1])} XRP (≈ $${fm(l[0]*l[1])}) waiting."><i style="width:${l[1]/mx*100}%"></i><span>${fp(l[0])}</span><span>${fm(l[1])}</span><span>$${fm(l[0]*l[1])}</span></div>`;
+  const row=(l,c)=>`<div class="row ${c}" data-tip="${c=='a'?'Sell':'Buy'} offers at ${fp(l[0])}: ${fm(l[1])} XRP (about $${fm(l[0]*l[1])}) waiting."><i style="width:${l[1]/mx*100}%"></i><span>${fp(l[0])}</span><span>${fm(l[1])}</span><span>$${fm(l[0]*l[1])}</span></div>`;
   $('lad').innerHTML='<div class="row" style="color:var(--m)"><span>Price</span><span>Amount (XRP)</span><span>Worth ($)</span></div>'+as.map(l=>row(l,'a')).join('')+`<div class="sp" data-tip="The gap between the cheapest seller (above) and the highest-paying buyer (below). Smaller gap = busier market.">price gap ${fp(ba-bb)} <em class="n">(spread)</em></div>`+bs.map(l=>row(l,'bd')).join('');
-  // L3 stats
-  const nw=S.ev.filter(e=>e.type==='NEW').length,cx=S.ev.filter(e=>e.type==='CANCEL'),fast=cx.filter(e=>e.fast).length;
-  $('l3s').innerHTML=`<span data-tip="New offers placed on Bitstamp in the last 60 seconds. Shows how busy the market is.">New per min <b>${nw}</b></span><span data-tip="Offers that disappeared in the last 60 seconds (cancelled or traded).">Removed per min <b>${cx.length}</b></span><span data-tip="Share of removed offers that lasted under 3 seconds. A high % usually means bots flashing fake offers (called spoofing), so big piles may not be real.">Gone in 3s <em class="n">(fast-cancel)</em> <b>${cx.length?Math.round(fast/cx.length*100):0}%</b></span><span data-tip="How many separate offers this page is keeping track of since you opened it.">Offers tracked <b>${S.ord.size}</b></span>`;
-  if(!S.paused)draw();}
+  $('ts').innerHTML='<div class="row" style="color:var(--m)"><span>Time</span><span>Price</span><span>Amount (XRP)</span></div>'+S.tr.slice(-14).reverse().map(t=>`<div class="row ${t.s==='buy'?'bd':'a'}" data-tip="${t.s==='buy'?'A buyer in a hurry took':'A seller in a hurry hit'} ${fm(t.q)} XRP (about $${fm(t.p*t.q)}) at ${fp(t.p)}."><span>${new Date(t.t).toLocaleTimeString([],{hour12:false})}</span><span>${fp(t.p)}</span><span>${fm(t.q)}</span></div>`).join('');
+  const nw=S.ev.filter(e=>e.type==='NEW').length,cxl=S.ev.filter(e=>e.type==='CANCEL'),fast=cxl.filter(e=>e.fast).length;
+  $('l3s').innerHTML=`<span data-tip="New offers placed on Bitstamp in the last 60 seconds. Shows how busy the market is.">New per min <b>${nw}</b></span><span data-tip="Offers that disappeared in the last 60 seconds (cancelled or traded).">Removed per min <b>${cxl.length}</b></span><span data-tip="Share of removed offers that lasted under 3 seconds. A high % usually means bots flashing fake offers (called spoofing), so big piles may not be real.">Gone in 3s <em class="n">(fast-cancel)</em> <b>${cxl.length?Math.round(fast/cxl.length*100):0}%</b></span><span data-tip="How many separate offers this page is keeping track of since you opened it.">Offers tracked <b>${S.ord.size}</b></span>`;
+  if(!S.paused)draw()}
 setInterval(tick,1000);
-// ---------- heatmap
-const LUT=(()=>{const st=[[0,244,246,250],[.2,214,226,244],[.45,150,180,222],[.7,70,110,180],[1,25,45,95]],o=[];
- for(let i=0;i<256;i++){const v=i/255;let k=1;while(st[k][0]<v)k++;const a=st[k-1],b=st[k],f=(v-a[0])/(b[0]-a[0]);
- o.push(`rgb(${a[1]+(b[1]-a[1])*f|0},${a[2]+(b[2]-a[2])*f|0},${a[3]+(b[3]-a[3])*f|0})`)}return o})();
-const cv=$('c'),ov=$('o'),cx=cv.getContext('2d'),ox=ov.getContext('2d');
+// ---- drawing
+const LUT=(()=>{const st=[[0,23,34,46],[.18,16,56,100],[.4,24,112,168],[.6,214,196,58],[.8,232,80,48],[1,255,236,230]],o=[];
+ for(let i=0;i<256;i++){const v=i/255;let k=1;while(st[k][0]<v)k++;const a=st[k-1],b=st[k],f=(v-a[0])/(b[0]-a[0]);o.push(`rgb(${a[1]+(b[1]-a[1])*f|0},${a[2]+(b[2]-a[2])*f|0},${a[3]+(b[3]-a[3])*f|0})`)}return o})();
+const cv=$('c'),ov=$('o'),cx=cv.getContext('2d'),ox=ov.getContext('2d'),NF='15px "Patrick Hand","Comic Sans MS",cursive';
 function size(){const r=$('hm').getBoundingClientRect(),d=devicePixelRatio||1;for(const c of[cv,ov]){c.width=r.width*d;c.height=r.height*d}
  cx.setTransform(d,0,0,d,0,0);ox.setTransform(d,0,0,d,0,0);S.W=r.width;S.H=r.height;draw()}
-addEventListener('resize',size);
-['rng','gam','whale'].forEach(i=>$(i).oninput=draw);
+addEventListener('resize',size);['rng','gam','notes'].forEach(i=>$(i).oninput=draw);
+if(document.fonts)document.fonts.load('15px "Patrick Hand"').then(draw);
 $('pause').onclick=e=>{S.paused=!S.paused;e.target.textContent=S.paused?'Resume':'Pause';if(!S.paused)draw()};
+function wrap(t,w){const L=[];let l='';for(const x of t.split(' ')){const m=l?l+' '+x:x;if(cx.measureText(m).width>w&&l){L.push(l);l=x}else l=m}L.push(l);return L}
+function note(t,x,y,w,fill,fs){cx.font=(fs||15)+'px "Patrick Hand","Comic Sans MS",cursive';const L=wrap(t,w-16),lh=(fs||15)+4,h=L.length*lh+10;
+  cx.save();if(fill){cx.fillStyle=fill;cx.fillRect(x,y,w,h)}else{cx.shadowColor='#000';cx.shadowBlur=5}
+  cx.fillStyle='#fff';cx.textBaseline='alphabetic';L.forEach((l,i)=>cx.fillText(l,x+8,y+(fs||15)+3+i*lh));cx.restore();return h}
+function ell(x,y,rx,ry){cx.save();cx.strokeStyle='#fff';cx.lineWidth=2;cx.setLineDash([7,5]);cx.beginPath();cx.ellipse(x,y,rx,ry,0,0,7);cx.stroke();cx.restore()}
+function arrow(x1,y1,x2,y2){cx.save();cx.strokeStyle='#fff';cx.lineWidth=1.5;cx.beginPath();cx.moveTo(x1,y1);cx.lineTo(x2,y2);cx.stroke();const a=Math.atan2(y2-y1,x2-x1);
+  cx.beginPath();cx.moveTo(x2,y2);cx.lineTo(x2-9*Math.cos(a-.4),y2-9*Math.sin(a-.4));cx.lineTo(x2-9*Math.cos(a+.4),y2-9*Math.sin(a+.4));cx.fillStyle='#fff';cx.fill();cx.restore()}
 function draw(){
   const W=S.W,H=S.H,n=S.cols.length;if(!W||!n)return;
-  const PW=W-64,PH=H-20,R=+$('rng').value,g=+$('gam').value,mid=S.mid,lo=mid*(1-R),hi=mid*(1+R),rows=Math.max(20,PH/3|0),cw=PW/MAXC;
-  S.view={PW,PH,lo,hi,rows,cw};
-  cx.fillStyle='#fbfcfe';cx.fillRect(0,0,W,H);
-  S.cache=S.cols.map(c=>{const r=new Float32Array(rows);const d=c.d;
-    for(let i=0;i<d.length;i+=2){const p=d[i];if(p<lo||p>=hi)continue;r[(p-lo)/(hi-lo)*rows|0]+=p*d[i+1]}return r});
-  const vals=[];for(const r of S.cache)for(let i=0;i<rows;i++)if(r[i]>0)vals.push(r[i]);
-  vals.sort((a,b)=>a-b);const mx=vals[vals.length*.985|0]||1;S.mx=mx;
-  const rh=PH/rows;
-  S.cache.forEach((r,ci)=>{const x=PW-(n-ci)*cw;
-    for(let i=0;i<rows;i++){const v=r[i];if(v<=0)continue;const k=Math.min(1,Math.pow(v/mx,g));if(k<.03)continue;
-      cx.fillStyle=LUT[k*255|0];cx.fillRect(x,PH-(i+1)*rh,cw+.6,rh+.6)}});
-  const Y=p=>PH-(p-lo)/(hi-lo)*PH,X=t=>PW-(Date.now()-t)/1000*cw;
-  cx.strokeStyle='#1f2a44';cx.lineWidth=1.2;cx.beginPath();
-  S.cols.forEach((c,i)=>{const x=PW-(n-i)*cw+cw/2;i?cx.lineTo(x,Y(c.mid)):cx.moveTo(x,Y(c.mid))});cx.stroke();
-  for(const t of S.tr){const x=X(t.t),y=Y(t.p);if(x<0||y<0||y>PH)continue;
-    cx.fillStyle=t.s==='buy'?'rgba(47,143,107,.6)':'rgba(196,87,94,.6)';cx.strokeStyle='#fff';cx.lineWidth=1;
-    cx.beginPath();cx.arc(x,y,Math.min(8,2+Math.sqrt(t.p*t.q/900)),0,7);cx.fill();cx.stroke()}
-  cx.fillStyle='#f6f7f9';cx.fillRect(PW,0,64,H);cx.fillRect(0,PH,W,20);cx.fillStyle='#6b7487';cx.font='11px ui-monospace,monospace';
-  for(let i=0;i<=6;i++){const p=lo+(hi-lo)*i/6;cx.fillText(fp(p),PW+4,Y(p)+4);cx.strokeStyle='rgba(0,0,0,.06)';cx.lineWidth=1;cx.beginPath();cx.moveTo(0,Y(p));cx.lineTo(PW,Y(p));cx.stroke()}
-  for(let m=0;m*60<MAXC;m+=3){const x=PW-m*60*cw;if(x>20)cx.fillText(m?'-'+m+'m':'now',x-12,H-6)}
-  cx.fillStyle='#1f2a44';cx.fillRect(PW,Y(mid)-8,64,16);cx.fillStyle='#fff';cx.fillText(fp(mid),PW+4,Y(mid)+4);
-  cx.fillStyle='rgba(60,70,90,.55)';cx.fillText('↑ higher price',8,14);cx.fillText('↓ lower price',8,PH-8);cx.fillText('older ←     → newest',PW-150,14);
-  hover();}
-// ---------- hover on heatmap
+  const NP=W<720?1:3,PNW=58,AX=62,VOLH=34,CVDH=50,TAX=18,PW=W-AX-NP*PNW,PH=H-VOLH-CVDH-TAX;
+  const R=+$('rng').value,g=+$('gam').value,mid=S.mid,lo=mid*(1-R),hi=mid*(1+R),rows=Math.max(20,PH/6|0),rh=PH/rows,cw=PW/MAXC;
+  S.v={PW,PH,AX,PNW,NP,VOLH,CVDH,lo,hi,rows,rh,cw,n};
+  const Y=p=>PH-(p-lo)/(hi-lo)*PH,X=ci=>PW-(n-ci)*cw,XT=t=>PW-(Date.now()-t)/1000*cw;
+  cx.fillStyle='#16212d';cx.fillRect(0,0,W,H);
+  S.cache=S.cols.map(c=>{const r=new Float32Array(rows),d=c.d;for(let i=0;i<d.length;i+=2){const p=d[i];if(p<lo||p>=hi)continue;r[(p-lo)/(hi-lo)*rows|0]+=p*d[i+1]}return r});
+  const vals=[];for(const r of S.cache)for(let i=0;i<rows;i++)if(r[i]>0)vals.push(r[i]);vals.sort((a,b)=>a-b);const mx=vals[vals.length*.985|0]||1;S.mx=mx;
+  S.cache.forEach((r,ci)=>{const x=X(ci);for(let i=0;i<rows;i++){const v=r[i];if(v<=0)continue;const k=Math.min(1,Math.pow(v/mx,g));if(k<.04)continue;cx.fillStyle=LUT[k*255|0];cx.fillRect(x,PH-(i+1)*rh,cw+.6,rh+.4)}});
+  cx.strokeStyle='rgba(230,237,245,.85)';cx.lineWidth=1;cx.beginPath();S.cols.forEach((c,i)=>{const x=X(i)+cw/2;i?cx.lineTo(x,Y(c.mid)):cx.moveTo(x,Y(c.mid))});cx.stroke();
+  cx.save();cx.setLineDash([5,4]);cx.lineWidth=1;cx.strokeStyle='#f0504a';cx.beginPath();cx.moveTo(PW-90,Y(S.ba));cx.lineTo(PW,Y(S.ba));cx.stroke();cx.strokeStyle='#21c577';cx.beginPath();cx.moveTo(PW-90,Y(S.bb));cx.lineTo(PW,Y(S.bb));cx.stroke();cx.restore();
+  for(const t of S.tr){const x=XT(t.t),y=Y(t.p);if(x<0||y<0||y>PH)continue;const r=Math.min(22,3+Math.sqrt(t.p*t.q)/6);
+    cx.fillStyle=t.s==='buy'?'rgba(94,214,196,.5)':'rgba(250,120,130,.5)';cx.strokeStyle=t.s==='buy'?'rgba(150,240,225,.8)':'rgba(255,170,175,.8)';cx.lineWidth=1;cx.beginPath();cx.arc(x,y,r,0,7);cx.fill();cx.stroke()}
+  // right side: axis + panels
+  cx.fillStyle='#101821';cx.fillRect(PW,0,W-PW,H);
+  const rowOf=p=>(p-lo)/(hi-lo)*rows|0,cobB=new Float32Array(rows),cobA=new Float32Array(rows),vb=new Float32Array(rows),vs=new Float32Array(rows);
+  for(const [p,q] of S.b)if(p>=lo&&p<hi)cobB[rowOf(p)]+=q;for(const [p,q] of S.a)if(p>=lo&&p<hi)cobA[rowOf(p)]+=q;
+  for(const e of S.vp.values())if(e.p>=lo&&e.p<hi){const r=rowOf(e.p);vb[r]+=e.b;vs[r]+=e.s}
+  S.pan={cobB,cobA,vb,vs};
+  const mxC=Math.max(1,...cobB,...cobA),mxV=Math.max(1,...vb.map((v,i)=>v+vs[i])),mxD=Math.max(1,...vb.map((v,i)=>Math.abs(v-vs[i])));
+  cx.font='10px system-ui';const titles=['COB','SVP','SVP DELTA'];
+  for(let k=0;k<NP;k++){const x0=PW+AX+k*PNW;cx.fillStyle='#1b2937';cx.fillRect(x0,0,PNW-2,PH);cx.fillStyle='#8da0b8';cx.fillText(titles[k],x0+3,10);
+    for(let i=0;i<rows;i++){const y=PH-(i+1)*rh,h=Math.max(1,rh-.8);
+      if(k===0){if(cobB[i]){cx.fillStyle='#21c577';cx.fillRect(x0,y,cobB[i]/mxC*(PNW-3),h)}if(cobA[i]){cx.fillStyle='#f0504a';cx.fillRect(x0,y,cobA[i]/mxC*(PNW-3),h)}}
+      else if(k===1){const t=vb[i]+vs[i];if(t){const wb=vb[i]/mxV*(PNW-3),ws=vs[i]/mxV*(PNW-3);cx.fillStyle='#21c577';cx.fillRect(x0,y,wb,h);cx.fillStyle='#f0504a';cx.fillRect(x0+wb,y,ws,h)}}
+      else{const d=vb[i]-vs[i];if(d){cx.fillStyle=d>0?'#21c577':'#f0504a';const w=Math.abs(d)/mxD*(PNW/2-2);cx.fillRect(d>0?x0+PNW/2:x0+PNW/2-w,y,w,h)}}}
+    if(k===2){cx.strokeStyle='#3a516d';cx.beginPath();cx.moveTo(x0+PNW/2,0);cx.lineTo(x0+PNW/2,PH);cx.stroke()}}
+  cx.fillStyle='#cfd9e6';cx.font='11px ui-monospace,monospace';
+  for(let i=0;i<=8;i++){const p=lo+(hi-lo)*i/8;cx.fillText(fp(p),PW+4,Y(p)+4);cx.strokeStyle='rgba(255,255,255,.05)';cx.beginPath();cx.moveTo(0,Y(p));cx.lineTo(PW,Y(p));cx.stroke()}
+  cx.fillStyle='#e6edf5';cx.fillRect(PW,Y(mid)-8,AX-2,16);cx.fillStyle='#101821';cx.fillText(fp(mid),PW+4,Y(mid)+4);
+  // bottom strips
+  let mv=1;for(const c of S.cols)mv=Math.max(mv,c.bv+c.sv);const vy=PH+VOLH-2;
+  cx.fillStyle='#131d29';cx.fillRect(0,PH,PW,VOLH+CVDH);
+  S.cols.forEach((c,i)=>{const x=X(i),hb=c.bv/mv*(VOLH-6),hs=c.sv/mv*(VOLH-6);cx.fillStyle='#21c577';cx.fillRect(x,vy-hb,Math.max(1,cw),hb);cx.fillStyle='#f0504a';cx.fillRect(x,vy-hb-hs,Math.max(1,cw),hs)});
+  let cmin=1e18,cmax=-1e18;for(const c of S.cols){cmin=Math.min(cmin,c.cvd);cmax=Math.max(cmax,c.cvd)}if(cmax-cmin<1){cmax+=1;cmin-=1}
+  const cy=v=>PH+VOLH+CVDH-6-(v-cmin)/(cmax-cmin)*(CVDH-12);cx.strokeStyle='#e6edf5';cx.lineWidth=1.2;cx.beginPath();S.cols.forEach((c,i)=>{const x=X(i)+cw/2;i?cx.lineTo(x,cy(c.cvd)):cx.moveTo(x,cy(c.cvd))});cx.stroke();
+  cx.strokeStyle='#2a3a4d';cx.beginPath();cx.moveTo(0,PH+VOLH);cx.lineTo(PW,PH+VOLH);cx.stroke();
+  cx.fillStyle='#8da0b8';cx.font='10px system-ui';cx.fillText('VOLUME (green buy / red sell)',6,PH+11);cx.fillText('CVD (running buying minus selling)',6,PH+VOLH+11);
+  const cv0=S.cvd;cx.fillStyle=cv0>=0?'#21c577':'#f0504a';cx.font='bold 13px ui-monospace,monospace';cx.fillText('CVD',PW+6,PH+VOLH+16);cx.fillText((cv0>=0?'+':'−')+fm(Math.abs(cv0)),PW+6,PH+VOLH+34);cx.fillStyle='#8da0b8';cx.font='10px system-ui';cx.fillText('XRP',PW+6,PH+VOLH+46);
+  cx.fillStyle='#8da0b8';cx.font='11px ui-monospace,monospace';
+  for(let m=0;m*60<MAXC;m+=2){const x=PW-m*60*cw;if(x>26)cx.fillText(new Date(Date.now()-m*60000).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',hour12:false}),x-14,H-5)}
+  if($('notes').checked)notes({PW,PH,lo,hi,rows,rh,n,Y,X,XT});
+  hover()}
+function notes(o){
+  const {PW,PH,lo,hi,rows,rh,n,Y,X,XT}=o,last=S.cache[n-1],mid=S.mid,RED='rgba(224,84,76,.93)',pr=r=>lo+(r+.5)/rows*(hi-lo),bw=Math.min(300,PW*.42);
+  let bi=-1,bv=0;for(let i=0;i<rows;i++)if(last[i]>bv){bv=last[i];bi=i}
+  if(bi>=0&&bv>.5*S.mx){const p=pr(bi),y=Y(p),buy=p<mid;ell(PW-55,y,55,Math.max(8,rh*2));
+    const h=note(`Big pile of ${buy?'BUY':'SELL'} offers at $${fp(p)} (about $${fm(bv)} waiting). Price often slows or bounces near big piles. ${buy?'Could act as a floor.':'Could act as a ceiling.'}`,14,14,bw,RED);arrow(14+bw,14+h/2,PW-112,y)}
+  const mxV=new Float32Array(rows),f=new Int32Array(rows).fill(-1),l=new Int32Array(rows).fill(-1);
+  for(let ci=Math.max(0,n-300);ci<n-8;ci++){const r=S.cache[ci];for(let i=0;i<rows;i++)if(r[i]>.5*S.mx){mxV[i]=Math.max(mxV[i],r[i]);if(f[i]<0)f[i]=ci;l[i]=ci}}
+  let best=-1;for(let i=0;i<rows;i++){if(f[i]<0||l[i]>=n-8||l[i]-f[i]<8||last[i]>=.2*mxV[i])continue;const p=pr(i);let mn=1e9,mxm=0;for(let ci=f[i];ci<n;ci++){mn=Math.min(mn,S.cols[ci].mid);mxm=Math.max(mxm,S.cols[ci].mid)}
+    if((p<mn-(hi-lo)/rows||p>mxm+(hi-lo)/rows)&&(best<0||mxV[i]>mxV[best]))best=i}
+  if(best>=0){const p=pr(best),y=Y(p),x1=X(f[best]),x2=X(l[best]);ell((x1+x2)/2,y,(x2-x1)/2+10,Math.max(8,rh*2));
+    const by=Math.max(60,PH-130),h=note(`Offers at $${fp(p)} (about $${fm(mxV[best])}) disappeared and were never traded. They were pulled, not filled. Big piles can be fake, so do not count on them staying.`,14,by,bw,RED);arrow(14+bw/2,y>by?by:by+h,(x1+x2)/2,y>by?y+Math.max(8,rh*2):y-Math.max(8,rh*2))}
+  let big=null;const now=Date.now();for(const t of S.tr)if(now-t.t<60000&&(!big||t.p*t.q>big.p*big.q))big=t;
+  if(big&&big.p*big.q>=1500){const x=XT(big.t),y=Y(big.p);if(x>0&&y>0&&y<PH){const r=Math.min(22,3+Math.sqrt(big.p*big.q)/6);ell(x,y,r+10,r+10);
+    const w=250,nx=Math.max(10,Math.min(x-w/2,PW-w-10)),ny=y<PH/2?y+r+22:y-r-80;
+    const h=note(`${now-big.t<20000?'Someone just':'A moment ago, someone'} ${big.s==='buy'?'bought':'sold'} aggressively (in a hurry) ${fm(big.q)} XRP, about $${fm(big.p*big.q)}.`,nx,ny,w,null,19);arrow(nx+w/2,y<PH/2?ny:ny+h,x,y<PH/2?y+r+10:y-r-10)}}}
+// ---- hover
 ov.onmousemove=e=>{const r=ov.getBoundingClientRect();S.mouse={x:e.clientX-r.left,y:e.clientY-r.top,cx:e.clientX,cy:e.clientY};hover()};
-ov.onmouseleave=()=>{S.mouse=null;hover()};
+ov.onmouseleave=()=>{S.mouse=null;hover();tip.style.display='none'};
 function hover(){
-  ox.clearRect(0,0,S.W,S.H);const m=S.mouse,v=S.view;
-  if(!m||!v||m.x>v.PW||m.y>v.PH){if(m)tip.style.display='none';return}
-  ox.strokeStyle='rgba(30,40,60,.45)';ox.setLineDash([4,4]);ox.beginPath();ox.moveTo(m.x,0);ox.lineTo(m.x,v.PH);ox.moveTo(0,m.y);ox.lineTo(v.PW,m.y);ox.stroke();
-  const n=S.cols.length,ci=n-Math.ceil((v.PW-m.x)/v.cw),ri=Math.min(v.rows-1,(v.PH-m.y)/v.PH*v.rows|0);
-  const price=v.lo+(v.hi-v.lo)*(v.PH-m.y)/v.PH,rh=(v.hi-v.lo)/v.rows;
-  let txt=`Price at your mouse: $${fp(price)}`;
-  if(ci>=0&&ci<n){const val=S.cache[ci]?S.cache[ci][ri]:0,age=Math.round((Date.now()-S.cols[ci].t)/1000);
-    const big=val/S.mx>.7,buy=price<S.cols[ci].mid;txt+=`\n${new Date(S.cols[ci].t).toLocaleTimeString()} (${age}s ago)\nMoney waiting at this price: about $${fm(val)}\n${val<=0?'Nothing waiting here.':big?(buy?'🔥 Big buyer wall: a possible floor.':'🔥 Big seller wall: a possible ceiling.'):(buy?'Some buyers waiting here.':'Some sellers waiting here.')}`;}
-  tip.style.whiteSpace='pre-line';tip.textContent=txt;tip.style.display='block';
-  tip.style.left=Math.min(m.cx+14,innerWidth-300)+'px';tip.style.top=Math.min(m.cy+16,innerHeight-110)+'px';}
-// help legend inside heatmap
+  ox.clearRect(0,0,S.W,S.H);const m=S.mouse,v=S.v;if(!m||!v)return;
+  const T=(t)=>showTip(t,m.cx,m.cy);
+  if(m.y>v.PH){T(m.y<v.PH+v.VOLH?'VOLUME BARS: how much XRP was bought in a hurry (green) and sold in a hurry (red) each second. Tall bars = busy moments.':'CVD LINE: a running total of rushed buying minus rushed selling since you opened this page. Rising = buyers more in a hurry. Falling = sellers. If price rises while this falls, the move may be weak.');return}
+  const rr=Math.min(v.rows-1,Math.max(0,(v.PH-m.y)/v.PH*v.rows|0)),price=v.lo+(v.hi-v.lo)*(v.PH-m.y)/v.PH;
+  if(m.x>v.PW){
+    if(m.x<v.PW+v.AX){T('PRICE SCALE (US dollars). The white tag is the price right now.');return}
+    const k=Math.floor((m.x-v.PW-v.AX)/v.PNW),P=S.pan;if(!P||k<0||k>=v.NP)return;
+    ox.strokeStyle='rgba(255,255,255,.4)';ox.beginPath();ox.moveTo(v.PW,m.y);ox.lineTo(S.W,m.y);ox.stroke();
+    if(k===0)T(`COB (offers waiting right now) at ${fp(price)}:\nBuy: ${fm(P.cobB[rr])} XRP · Sell: ${fm(P.cobA[rr])} XRP\nLong green bar = lots of buyers waiting. Long red bar = lots of sellers waiting.`);
+    else if(k===1)T(`SVP (what actually traded since you opened this page) at ${fp(price)}:\nBought: ${fm(P.vb[rr])} XRP · Sold: ${fm(P.vs[rr])} XRP\nLong bar = a busy price where lots of trading happened.`);
+    else{const d=P.vb[rr]-P.vs[rr];T(`SVP DELTA at ${fp(price)}:\nBuying minus selling = ${d>=0?'+':'−'}${fm(Math.abs(d))} XRP\nRight/green = buyers won at this price. Left/red = sellers won.`)}return}
+  const now=Date.now();for(const t of S.tr){const x=PW_(t),y=v.PH-(t.p-v.lo)/(v.hi-v.lo)*v.PH,r=Math.min(22,3+Math.sqrt(t.p*t.q)/6);
+    if(Math.hypot(x-m.x,y-m.y)<=r+3){ox.strokeStyle='#fff';ox.lineWidth=2;ox.beginPath();ox.arc(x,y,r+2,0,7);ox.stroke();T(`${t.s==='buy'?'A BUYER in a hurry took':'A SELLER in a hurry hit'} ${fm(t.q)} XRP (about $${fm(t.p*t.q)}) at ${fp(t.p)}\n${new Date(t.t).toLocaleTimeString()} (${Math.round((now-t.t)/1000)}s ago)\n"In a hurry" = they accepted whatever price was available instead of waiting.`);return}}
+  ox.strokeStyle='rgba(255,255,255,.4)';ox.setLineDash([4,4]);ox.beginPath();ox.moveTo(m.x,0);ox.lineTo(m.x,v.PH);ox.moveTo(0,m.y);ox.lineTo(v.PW,m.y);ox.stroke();
+  const ci=v.n-Math.ceil((v.PW-m.x)/v.cw);let txt=`Price at your mouse: $${fp(price)}`;
+  if(ci>=0&&ci<v.n&&S.cache[ci]){const val=S.cache[ci][rr],c=S.cols[ci],big=val/S.mx>.7,buy=price<c.mid;
+    txt+=`\n${new Date(c.t).toLocaleTimeString()} (${Math.round((now-c.t)/1000)}s ago)\nMoney waiting at this price: about $${fm(val)}\n${val<=0?'Nothing waiting here.':big?(buy?'🔥 Big buyer pile: a possible floor.':'🔥 Big seller pile: a possible ceiling.'):(buy?'Some buyers waiting here.':'Some sellers waiting here.')}`}
+  T(txt)}
+function PW_(t){const v=S.v;return v.PW-(Date.now()-t.t)/1000*v.cw}
 size();
 </script></body></html>
